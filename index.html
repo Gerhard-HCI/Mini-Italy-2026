@@ -1,949 +1,189 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#fdf8eb" />
+<meta name="theme-color" content="#1E1E1E" />
 <meta name="color-scheme" content="light" />
 <meta name="format-detection" content="telephone=no" />
 <title>Mini Italy 2026 · Gerhard · Happy Camper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ─────────────────────────────────────────────────────────────
-   MINI ITALY 2026 · GERHARD HUBER · HAPPY CAMPER
-   Single-file mobile-first travel companion.
-   Layout follows the Isaac template; palette is Italian summer
-   (wine · cream · olive · ochre).
-   No API keys required — weather uses Open-Meteo (free, no key).
-   Editable trip data lives in TRIP_DATA near the bottom of <script>.
-   ───────────────────────────────────────────────────────────── */
-
 :root {
-  /* Italian summer palette — wine · cream · olive · ochre */
-  --ink:          #2a1f1a;
-  --ink-2:        #4a3b32;
-  --ink-3:        #75645a;
-  --ink-4:        #a39185;
-
-  --cream:        #f8f1e1;
-  --paper:        #fdf8eb;
-  --paper-2:      #fbf3df;
-  --white:        #ffffff;
-
-  --wine:         #6b1f2a;
-  --wine-deep:    #4a1018;
-  --wine-soft:    #8a3a44;
-  --wine-pale:    #f4e4e6;
-
-  --ochre:        #b8893a;
-  --ochre-bright: #d4ae6a;
-  --ochre-soft:   #f2e3c5;
-
-  --olive:        #5c6b3f;
-  --olive-soft:   #e8ecdc;
-
-  --line:         rgba(107, 31, 42, 0.14);
-  --line-soft:    rgba(107, 31, 42, 0.07);
-  --line-strong:  rgba(107, 31, 42, 0.30);
-
-  --green:        #2d6a3f;
-  --green-soft:   #d6efd6;
-  --amber:        #b88e2a;
-  --amber-soft:   #fff4cc;
-  --red:          #b8291e;
-  --red-soft:     #fdecea;
-  --grey-soft:    #ececea;
-
-  --shadow-sm:    0 1px 2px rgba(42,31,26,0.05), 0 1px 1px rgba(42,31,26,0.03);
-  --shadow-md:    0 4px 16px rgba(42,31,26,0.06), 0 1px 3px rgba(42,31,26,0.04);
-  --shadow-lg:    0 12px 32px rgba(42,31,26,0.08), 0 2px 6px rgba(42,31,26,0.04);
-
-  --r-sm:         8px;
-  --r-md:         12px;
-  --r-lg:         16px;
-  --r-xl:         22px;
-
-  --header-h:     74px;
-  --tab-h:        50px;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-body {
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
-  background: var(--paper);
-  color: var(--ink);
-  font-size: 15px;
-  line-height: 1.5;
-  min-height: 100dvh;
-  overflow-x: hidden;
-}
-button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
-a { color: var(--wine); text-decoration: none; }
-
-/* ─── HEADER ─────────────────────────────────────────────── */
-#app-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(253, 248, 235, 0.94);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border-bottom: 1px solid var(--line);
-  padding-top: env(safe-area-inset-top);
-}
-.header-top {
-  padding: 12px 20px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-.brand-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--wine) 0%, var(--wine-deep) 100%);
-  display: grid;
-  place-items: center;
-  font-size: 16px;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
-}
-.brand-text { min-width: 0; }
-.brand-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.01em;
-  color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.brand-sub {
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin-top: 3px;
-  font-weight: 500;
-}
-.clock-block {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
-  flex-shrink: 0;
-}
-#cest-clock {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 19px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-#trip-day-label {
-  font-size: 9.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin-top: 4px;
-  font-weight: 500;
-}
-
-/* tab nav */
-.tab-nav {
-  display: flex;
-  gap: 4px;
-  padding: 0 20px;
-  border-top: 1px solid var(--line-soft);
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.tab-btn {
-  flex: 1;
-  padding: 10px 8px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  border-bottom: 2px solid transparent;
-  transition: color 0.18s, border-color 0.18s;
-  position: relative;
-}
-.tab-btn.active {
-  color: var(--wine);
-  border-bottom-color: var(--wine);
-}
-.tab-btn:active { transform: scale(0.97); }
-
-/* ─── MAIN PANELS ────────────────────────────────────────── */
-.tab-panel {
-  display: none;
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 24px 18px 80px;
-}
-.tab-panel.active { display: block; animation: fadeIn 0.25s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-
-/* ─── HERO ───────────────────────────────────────────────── */
-.hero {
-  text-align: center;
-  padding: 28px 16px 26px;
-  background: linear-gradient(180deg, var(--paper-2) 0%, var(--paper) 100%);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  margin-bottom: 24px;
-  position: relative;
-  overflow: hidden;
-}
-.hero::before {
-  content: "";
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(184,137,58,0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 100%, rgba(107,31,42,0.06) 0%, transparent 50%);
-  pointer-events: none;
-}
-.hero-eyebrow {
-  font-size: 10.5px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--ochre);
-  font-weight: 600;
-  margin-bottom: 10px;
-  position: relative;
-}
-.hero-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 44px;
-  font-weight: 500;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  margin-bottom: 4px;
-  position: relative;
-}
-.hero-title em {
-  font-style: italic;
-  font-weight: 400;
-  color: var(--wine);
-}
-.hero-sub {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-style: italic;
-  font-size: 19px;
-  color: var(--ink-2);
-  margin-top: 4px;
-  position: relative;
-}
-.hero-rule {
-  width: 60px;
-  height: 1px;
-  background: var(--ochre);
-  margin: 14px auto;
-  position: relative;
-}
-.hero-meta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 16px;
-  font-size: 13px;
-  color: var(--ink-2);
-  position: relative;
-  margin-top: 4px;
-}
-.hero-meta strong { color: var(--ink); font-weight: 600; }
-.hero-name {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--ink);
-  margin-top: 14px;
-  position: relative;
-  letter-spacing: 0.01em;
-}
-.hero-name-sub {
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin-top: 4px;
-  font-weight: 500;
-  position: relative;
-}
-
-/* ─── SECTION LABELS ─────────────────────────────────────── */
-.section-label {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 10.5px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 600;
-  margin: 24px 0 14px;
-}
-.section-label::before,
-.section-label::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
-
-/* ─── HOTELS SUMMARY ─────────────────────────────────────── */
-.hotels-grid {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-.hotel-card {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: var(--shadow-sm);
-}
-.hotel-num {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--wine-pale);
-  color: var(--wine);
-  display: grid;
-  place-items: center;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-.hotel-info { flex: 1; min-width: 0; }
-.hotel-name {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--ink);
-  line-height: 1.3;
-  margin-bottom: 2px;
-}
-.hotel-meta {
-  font-size: 11.5px;
-  color: var(--ink-3);
-  letter-spacing: 0.02em;
-}
-.hotel-link {
-  color: var(--ochre);
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-/* ─── DAY CARDS ──────────────────────────────────────────── */
-.day-card {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  margin-bottom: 14px;
-  overflow: hidden;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-.day-card.is-current {
-  border-color: var(--wine);
-  box-shadow: var(--shadow-md), 0 0 0 3px rgba(107,31,42,0.06);
-}
-.day-card.is-past { opacity: 0.62; }
-
-.day-header {
-  width: 100%;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-align: left;
-  transition: background 0.15s;
-}
-.day-header:hover { background: var(--paper-2); }
-.day-num {
-  width: 38px;
-  height: 38px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--cream);
-  border: 1px solid var(--line);
-  display: grid;
-  place-items: center;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--ink);
-}
-.day-card.is-current .day-num {
-  background: var(--wine);
-  color: var(--paper);
-  border-color: var(--wine);
-}
-.day-meta { flex: 1; min-width: 0; }
-.day-date {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--ink);
-  line-height: 1.15;
-}
-.day-title {
-  font-size: 12px;
-  color: var(--ink-3);
-  margin-top: 2px;
-  letter-spacing: 0.02em;
-}
-.day-city-badge {
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ochre);
-  font-weight: 600;
-  background: var(--ochre-soft);
-  padding: 3px 8px;
-  border-radius: 10px;
-  flex-shrink: 0;
-}
-.day-toggle {
-  font-size: 18px;
-  color: var(--ink-3);
-  transition: transform 0.25s;
-  flex-shrink: 0;
-  margin-left: 4px;
-}
-.day-card.expanded .day-toggle { transform: rotate(180deg); }
-
-.day-body {
-  display: none;
-  padding: 0 16px 16px;
-  border-top: 1px solid var(--line-soft);
-}
-.day-card.expanded .day-body { display: block; }
-
-/* hotel/weather strip */
-.day-strip {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  padding: 12px 0 14px;
-  border-bottom: 1px solid var(--line-soft);
-  margin-bottom: 14px;
-}
-.strip-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 12.5px;
-  color: var(--ink-2);
-}
-.strip-item .label {
-  font-size: 9.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 600;
-  flex-shrink: 0;
-  min-width: 56px;
-}
-.strip-item .val { font-weight: 500; color: var(--ink); flex: 1; }
-.weather-icon { font-size: 16px; }
-
-/* day note */
-.day-note {
-  background: var(--ochre-soft);
-  border-left: 3px solid var(--ochre);
-  padding: 10px 12px;
-  font-size: 13px;
-  font-style: italic;
-  color: var(--ink-2);
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
-  margin-bottom: 14px;
-  line-height: 1.45;
-}
-
-/* stops timeline */
-.stops { display: flex; flex-direction: column; gap: 0; }
-.stop {
-  position: relative;
-  padding: 8px 0 18px 38px;
-  border-left: 1px solid var(--line);
-  margin-left: 14px;
-}
-.stop:last-child { padding-bottom: 4px; }
-.stop::before {
-  content: "";
-  position: absolute;
-  left: -7px;
-  top: 14px;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: var(--white);
-  border: 2px solid var(--ochre);
-  z-index: 1;
-}
-.stop[data-type="restaurant"]::before { border-color: var(--wine); }
-.stop[data-type="hotel"]::before { border-color: var(--olive); }
-.stop[data-type="drive"]::before { border-color: var(--ink-3); }
-.stop[data-type="flight"]::before { border-color: var(--ochre); }
-
-.stop-header {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 4px;
-  flex-wrap: wrap;
-}
-.stop-time {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--wine);
-  letter-spacing: 0.01em;
-  flex-shrink: 0;
-}
-.stop-type-tag {
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 8px;
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-}
-.stop-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--ink);
-  line-height: 1.2;
-  margin: 2px 0 4px;
-}
-.stop-subtitle {
-  font-size: 13px;
-  color: var(--ink-2);
-  margin-bottom: 6px;
-  font-style: italic;
-}
-
-/* status badges */
-.badge {
-  display: inline-block;
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 10px;
-  margin-right: 5px;
-  margin-bottom: 4px;
-  border: 1px solid transparent;
-}
-.badge.confirmed { background: var(--green-soft); color: var(--green); border-color: rgba(45,106,63,0.2); }
-.badge.pending   { background: var(--amber-soft); color: var(--amber); border-color: rgba(184,142,42,0.25); }
-.badge.priority  { background: var(--red-soft); color: var(--red); border-color: rgba(184,41,30,0.25); }
-.badge.suggestion{ background: var(--grey-soft); color: var(--ink-3); border-color: var(--line); }
-.badge.host      { background: var(--olive-soft); color: var(--olive); border-color: rgba(92,107,63,0.25); }
-
-.stop-loc {
-  font-size: 12.5px;
-  color: var(--ink-3);
-  margin: 4px 0 8px;
-  display: flex;
-  gap: 6px;
-  align-items: flex-start;
-}
-.stop-loc::before { content: "📍"; font-size: 11px; flex-shrink: 0; line-height: 1.4; }
-
-.stop-notes {
-  font-size: 13px;
-  color: var(--ink-2);
-  line-height: 1.5;
-  margin: 6px 0 10px;
-}
-.stop-notes em {
-  background: var(--wine-pale);
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-style: normal;
-  color: var(--wine-deep);
-  font-weight: 500;
-}
-
-.stop-actions {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.act-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 11px;
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  background: var(--cream);
-  color: var(--ink);
-  border-radius: 18px;
-  border: 1px solid var(--line);
-  transition: all 0.15s;
-}
-.act-btn:hover { background: var(--ochre-soft); border-color: var(--ochre); }
-.act-btn:active { transform: scale(0.96); }
-.act-btn.primary { background: var(--wine); color: var(--paper); border-color: var(--wine); }
-.act-btn.primary:hover { background: var(--wine-deep); border-color: var(--wine-deep); }
-.act-btn.tel { background: var(--olive-soft); border-color: rgba(92,107,63,0.25); color: var(--olive); }
-
-/* drive subcard */
-.drive-card {
-  background: var(--paper-2);
-  border: 1px dashed var(--line-strong);
-  border-radius: var(--r-md);
-  padding: 10px 12px;
-  font-size: 12.5px;
-  color: var(--ink-2);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
-}
-.drive-card .miles {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--ochre);
-  flex-shrink: 0;
-}
-
-/* ─── UTILITIES TAB ──────────────────────────────────────── */
-.util-card {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  padding: 18px 16px;
-  margin-bottom: 14px;
-  box-shadow: var(--shadow-sm);
-}
-.util-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 4px;
-  line-height: 1.15;
-}
-.util-sub {
-  font-size: 11.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ochre);
-  font-weight: 600;
-  margin-bottom: 14px;
-}
-
-/* currency */
-.fx-rate-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  color: var(--ink-3);
-  margin-bottom: 12px;
-  padding: 8px 12px;
-  background: var(--paper-2);
-  border-radius: var(--r-sm);
-  border: 1px solid var(--line-soft);
-}
-.fx-rate-row strong { color: var(--ink); }
-.fx-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.fx-row label {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 600;
-  width: 36px;
-  flex-shrink: 0;
-}
-.fx-row input {
-  flex: 1;
-  font: 500 17px 'DM Sans', sans-serif;
-  font-variant-numeric: tabular-nums;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  background: var(--paper);
-  color: var(--ink);
-  outline: none;
-  transition: border-color 0.15s;
-}
-.fx-row input:focus { border-color: var(--wine); }
-.fx-edit {
-  font-size: 11.5px;
-  color: var(--ochre);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-/* generic list */
-.kv-list { display: grid; gap: 8px; }
-.kv-item {
-  display: grid;
-  grid-template-columns: minmax(90px, auto) 1fr;
-  gap: 10px;
-  font-size: 13px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--line-soft);
-}
-.kv-item:last-child { border-bottom: 0; }
-.kv-key {
-  font-size: 10.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 600;
-  padding-top: 1px;
-}
-.kv-val { color: var(--ink); font-weight: 500; }
-.kv-val .sub { display: block; color: var(--ink-3); font-weight: 400; font-size: 12px; margin-top: 2px; }
-
-/* tip block */
-.tip {
-  background: var(--olive-soft);
-  border-left: 3px solid var(--olive);
-  padding: 10px 12px;
-  font-size: 12.5px;
-  color: var(--ink-2);
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
-  margin: 12px 0;
-  line-height: 1.5;
-}
-.tip strong { color: var(--olive); }
-.alert {
-  background: var(--red-soft);
-  border-left: 3px solid var(--red);
-  padding: 10px 12px;
-  font-size: 12.5px;
-  color: var(--ink-2);
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
-  margin: 12px 0;
-  line-height: 1.5;
-}
-.alert strong { color: var(--red); }
-
-/* booking tracker */
-.booking-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--line-soft);
-  font-size: 13px;
-  gap: 8px;
-}
-.booking-row:last-child { border-bottom: 0; }
-.booking-row .name { font-weight: 500; color: var(--ink); flex: 1; min-width: 0; }
-.booking-row .name .sub { display: block; font-weight: 400; color: var(--ink-3); font-size: 11.5px; margin-top: 1px; }
-
-/* etiquette */
-.etiq-item {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--line-soft);
-}
-.etiq-item:last-child { border-bottom: 0; }
-.etiq-item h4 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--wine);
-  margin-bottom: 3px;
-}
-.etiq-item p { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
-
-/* ─── EMERGENCY TAB ──────────────────────────────────────── */
-.emerg-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-.emerg-call {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 18px 10px;
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  text-align: center;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.emerg-call:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-.emerg-call:active { transform: scale(0.97); }
-.emerg-icon { font-size: 26px; line-height: 1; }
-.emerg-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 26px;
-  font-weight: 600;
-  color: var(--wine);
-  line-height: 1;
-  letter-spacing: 0.02em;
-}
-.emerg-label {
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 600;
-}
-
-.contact-card {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  padding: 12px 14px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: background 0.15s;
-}
-.contact-card:hover { background: var(--paper-2); }
-.contact-name { font-weight: 600; font-size: 14px; color: var(--ink); flex: 1; min-width: 0; }
-.contact-name .sub { display: block; font-weight: 400; font-size: 11.5px; color: var(--ink-3); margin-top: 1px; }
-.contact-phone {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--wine);
-  flex-shrink: 0;
-  letter-spacing: 0.02em;
-}
-
-/* phrases */
-.phrase {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--line-soft);
-  font-size: 13px;
-}
-.phrase:last-child { border-bottom: 0; }
-.phrase .en { color: var(--ink-3); font-style: italic; }
-.phrase .it {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--ink);
-  text-align: right;
-}
-.phrase .it small { display: block; color: var(--ink-3); font-size: 11px; font-style: italic; margin-top: 1px; }
-
-/* toast */
-#toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: var(--ink);
-  color: var(--paper);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 10px 20px;
-  border-radius: 22px;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
-  z-index: 999;
-  white-space: nowrap;
-  max-width: 90vw;
-  box-shadow: var(--shadow-lg);
-}
-#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-/* tablet+ */
-@media (min-width: 700px) {
-  .header-top { padding: 14px 32px 12px; }
-  .tab-nav { padding: 0 32px; }
-  .tab-btn { font-size: 13px; padding: 12px 20px; flex: none; }
-  .brand-title { font-size: 22px; }
-  #cest-clock { font-size: 21px; }
-  .tab-panel { padding: 28px 28px 80px; max-width: 920px; }
-  .hero-title { font-size: 56px; }
-  .day-strip { grid-template-columns: 1fr 1fr; }
-  .emerg-grid { grid-template-columns: repeat(4, 1fr); }
-  .hotels-grid { grid-template-columns: 1fr 1fr; }
-}
-@media (min-width: 1100px) {
-  .tab-panel { max-width: 1100px; }
-  #days-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    align-items: start;
-  }
-  #days-container > .section-label,
-  #days-container > .hero,
-  #days-container > .hotels-wrap { grid-column: 1 / -1; }
-  .day-card { margin-bottom: 0; }
-}
-
-/* print-friendly fallback */
-@media print {
-  #app-header, .tab-nav, #toast { display: none; }
-  .tab-panel { display: block !important; }
-  .day-card { break-inside: avoid; }
-  .day-card .day-body { display: block !important; }
+  --ink:#2a1f1a;--ink-2:#4a3b32;--ink-3:#75645a;--ink-4:#a39185;
+  --cream:#F5EDD6;--paper:#fafaf7;--paper-2:#F5EDD6;--white:#ffffff;
+  --wine:#C9A84C;--wine-deep:#1E1E1E;--wine-soft:#B8993C;--wine-pale:#F5EDD6;
+  --ochre:#C9A84C;--ochre-bright:#d4ae6a;--ochre-soft:#F5EDD6;
+  --olive:#5c6b3f;--olive-soft:#e8ecdc;
+  --line:rgba(201,168,76,0.20);--line-soft:rgba(201,168,76,0.10);--line-strong:rgba(201,168,76,0.35);
+  --green:#2d6a3f;--green-soft:#d6efd6;--amber:#b88e2a;--amber-soft:#fff4cc;
+  --red:#b8291e;--red-soft:#fdecea;--grey-soft:#ececea;
+  --shadow-sm:0 1px 2px rgba(42,31,26,0.05),0 1px 1px rgba(42,31,26,0.03);
+  --shadow-md:0 4px 16px rgba(42,31,26,0.06),0 1px 3px rgba(42,31,26,0.04);
+  --shadow-lg:0 12px 32px rgba(42,31,26,0.08),0 2px 6px rgba(42,31,26,0.04);
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:22px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{font-family:'Poppins',system-ui,-apple-system,sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5;min-height:100dvh;overflow-x:hidden;}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
+a{color:var(--wine);text-decoration:none;}
+#app-header{position:sticky;top:0;z-index:100;background:#1E1E1E;border-bottom:2px solid var(--ochre);padding-top:env(safe-area-inset-top);}
+.header-top{padding:12px 20px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1200px;margin:0 auto;}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;}
+.brand-mark{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--ochre) 0%,#1E1E1E 100%);display:grid;place-items:center;font-size:16px;flex-shrink:0;box-shadow:var(--shadow-sm);border:1px solid rgba(201,168,76,0.4);}
+.brand-text{min-width:0;}
+.brand-title{font-family:'Lora',Georgia,serif;font-size:20px;font-weight:600;line-height:1;letter-spacing:.01em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.brand-sub{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ochre);margin-top:3px;font-weight:500;}
+.clock-block{display:flex;flex-direction:column;align-items:flex-end;text-align:right;flex-shrink:0;}
+#cest-clock{font-family:'Lora',Georgia,serif;font-size:19px;font-weight:500;letter-spacing:.04em;line-height:1;color:var(--ochre);font-variant-numeric:tabular-nums;}
+#trip-day-label{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(201,168,76,0.7);margin-top:4px;font-weight:500;}
+.tab-nav{display:flex;gap:4px;padding:0 20px;border-top:1px solid rgba(201,168,76,0.2);max-width:1200px;margin:0 auto;background:#1E1E1E;}
+.tab-btn{flex:1;padding:10px 8px;font-size:11px;font-weight:600;letter-spacing:.10em;text-transform:uppercase;color:rgba(255,255,255,0.45);border-bottom:2px solid transparent;transition:color .18s,border-color .18s;}
+.tab-btn.active{color:var(--ochre);border-bottom-color:var(--ochre);}
+.tab-btn:active{transform:scale(0.97);}
+.tab-panel{display:none;max-width:720px;margin:0 auto;padding:24px 18px 80px;}
+.tab-panel.active{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.hero{text-align:center;padding:28px 16px 26px;background:#1E1E1E;border:1px solid rgba(201,168,76,0.25);border-radius:var(--r-lg);margin-bottom:24px;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 0%,rgba(201,168,76,0.10) 0%,transparent 50%),radial-gradient(circle at 80% 100%,rgba(201,168,76,0.06) 0%,transparent 50%);pointer-events:none;}
+.hero-eyebrow{font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin-bottom:10px;position:relative;}
+.hero-title{font-family:'Lora',Georgia,serif;font-size:44px;font-weight:500;line-height:1.05;letter-spacing:-.01em;color:#fff;margin-bottom:4px;position:relative;}
+.hero-title em{font-style:italic;font-weight:400;color:var(--ochre);}
+.hero-sub{font-family:'Lora',Georgia,serif;font-style:italic;font-size:19px;color:rgba(255,255,255,0.65);margin-top:4px;position:relative;}
+.hero-rule{width:60px;height:1px;background:var(--ochre);margin:14px auto;position:relative;}
+.hero-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 16px;font-size:13px;color:rgba(255,255,255,0.55);position:relative;margin-top:4px;}
+.hero-meta strong{color:var(--ochre);font-weight:600;}
+.hero-name{font-family:'Lora',Georgia,serif;font-size:22px;font-weight:500;color:#fff;margin-top:14px;position:relative;letter-spacing:.01em;}
+.hero-name-sub{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,168,76,0.7);margin-top:4px;font-weight:500;position:relative;}
+.section-label{display:flex;align-items:center;gap:12px;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin:24px 0 14px;}
+.section-label::before,.section-label::after{content:"";flex:1;height:1px;background:rgba(201,168,76,0.25);}
+.hotels-grid{display:grid;gap:8px;margin-bottom:8px;}
+.hotel-card{background:var(--white);border:1px solid rgba(201,168,76,0.18);border-radius:var(--r-md);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm);}
+.hotel-num{width:28px;height:28px;border-radius:50%;background:#1E1E1E;color:var(--ochre);display:grid;place-items:center;font-family:'Lora',serif;font-size:15px;font-weight:600;flex-shrink:0;}
+.hotel-info{flex:1;min-width:0;}
+.hotel-name{font-weight:600;font-size:14px;color:var(--ink);line-height:1.3;margin-bottom:2px;}
+.hotel-meta{font-size:11.5px;color:var(--ink-3);letter-spacing:.02em;}
+.hotel-link{color:var(--ochre);font-size:18px;flex-shrink:0;}
+.day-card{background:var(--white);border:1px solid rgba(201,168,76,0.15);border-radius:var(--r-lg);margin-bottom:14px;overflow:hidden;transition:box-shadow .2s,border-color .2s;}
+.day-card.is-current{border-color:var(--ochre);box-shadow:var(--shadow-md),0 0 0 3px rgba(201,168,76,0.08);}
+.day-card.is-past{opacity:.62;}
+.day-header{width:100%;padding:14px 16px;display:flex;align-items:center;gap:12px;text-align:left;transition:background .15s;}
+.day-header:hover{background:var(--paper-2);}
+.day-num{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:var(--cream);border:1px solid rgba(201,168,76,0.3);display:grid;place-items:center;font-family:'Lora',serif;font-size:18px;font-weight:600;color:var(--ink);}
+.day-card.is-current .day-num{background:#1E1E1E;color:var(--ochre);border-color:var(--ochre);}
+.day-meta{flex:1;min-width:0;}
+.day-date{font-family:'Lora',serif;font-size:18px;font-weight:600;color:var(--ink);line-height:1.15;}
+.day-title{font-size:12px;color:var(--ink-3);margin-top:2px;letter-spacing:.02em;}
+.day-city-badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#1E1E1E;font-weight:700;background:var(--ochre);padding:3px 8px;border-radius:10px;flex-shrink:0;}
+.day-toggle{font-size:18px;color:var(--ochre);transition:transform .25s;flex-shrink:0;margin-left:4px;}
+.day-card.expanded .day-toggle{transform:rotate(180deg);}
+.day-body{display:none;padding:0 16px 16px;border-top:1px solid rgba(201,168,76,0.12);}
+.day-card.expanded .day-body{display:block;}
+.day-strip{display:grid;grid-template-columns:1fr;gap:8px;padding:12px 0 14px;border-bottom:1px solid rgba(201,168,76,0.10);margin-bottom:14px;}
+.strip-item{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-2);}
+.strip-item .label{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ochre);font-weight:600;flex-shrink:0;min-width:56px;}
+.strip-item .val{font-weight:500;color:var(--ink);flex:1;}
+.day-note{background:var(--ochre-soft);border-left:3px solid var(--ochre);padding:10px 12px;font-size:13px;font-style:italic;color:var(--ink-2);border-radius:0 var(--r-sm) var(--r-sm) 0;margin-bottom:14px;line-height:1.45;}
+.stops{display:flex;flex-direction:column;gap:0;}
+.stop{position:relative;padding:8px 0 18px 38px;border-left:1px solid rgba(201,168,76,0.25);margin-left:14px;}
+.stop:last-child{padding-bottom:4px;}
+.stop::before{content:"";position:absolute;left:-7px;top:14px;width:13px;height:13px;border-radius:50%;background:var(--white);border:2px solid var(--ochre);z-index:1;}
+.stop[data-type="restaurant"]::before{border-color:#1E1E1E;background:var(--ochre);}
+.stop[data-type="hotel"]::before{border-color:var(--olive);}
+.stop[data-type="drive"]::before{border-color:var(--ink-3);}
+.stop[data-type="train"]::before,.stop[data-type="flight"]::before{border-color:var(--ochre);}
+.stop-header{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;flex-wrap:wrap;}
+.stop-time{font-family:'Lora',serif;font-size:17px;font-weight:600;color:#1E1E1E;letter-spacing:.01em;flex-shrink:0;}
+.stop-type-tag{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ochre);font-weight:600;padding:2px 7px;border-radius:8px;background:var(--ochre-soft);border:1px solid rgba(201,168,76,0.25);}
+.stop-title{font-family:'Lora',serif;font-size:20px;font-weight:600;color:var(--ink);line-height:1.2;margin:2px 0 4px;}
+.stop-subtitle{font-size:13px;color:var(--ink-2);margin-bottom:6px;font-style:italic;}
+.badge{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:10px;margin-right:5px;margin-bottom:4px;border:1px solid transparent;}
+.badge.confirmed{background:var(--green-soft);color:var(--green);border-color:rgba(45,106,63,0.2);}
+.badge.pending{background:var(--amber-soft);color:var(--amber);border-color:rgba(184,142,42,0.25);}
+.badge.priority{background:var(--red-soft);color:var(--red);border-color:rgba(184,41,30,0.25);}
+.badge.suggestion,.badge.walkin{background:var(--grey-soft);color:var(--ink-3);border-color:var(--line);}
+.badge.host{background:var(--ochre-soft);color:#7a5e1a;border-color:rgba(201,168,76,0.35);}
+.stop-loc{font-size:12.5px;color:var(--ink-3);margin:4px 0 8px;display:flex;gap:6px;align-items:flex-start;}
+.stop-loc::before{content:"📍";font-size:11px;flex-shrink:0;line-height:1.4;}
+.stop-notes{font-size:13px;color:var(--ink-2);line-height:1.5;margin:6px 0 10px;}
+.stop-notes em{background:var(--ochre-soft);padding:1px 5px;border-radius:3px;font-style:normal;color:#6a4c10;font-weight:500;}
+.stop-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.act-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;font-size:11.5px;font-weight:600;letter-spacing:.02em;background:var(--cream);color:var(--ink);border-radius:18px;border:1px solid rgba(201,168,76,0.25);transition:all .15s;}
+.act-btn:hover{background:var(--ochre-soft);border-color:var(--ochre);}
+.act-btn:active{transform:scale(0.96);}
+.act-btn.primary{background:#1E1E1E;color:var(--ochre);border-color:var(--ochre);}
+.act-btn.primary:hover{background:#2C2C2C;}
+.act-btn.tel{background:var(--olive-soft);border-color:rgba(92,107,63,0.25);color:var(--olive);}
+.drive-card{background:var(--paper-2);border:1px dashed rgba(201,168,76,0.4);border-radius:var(--r-md);padding:10px 12px;font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:10px;margin-top:4px;}
+.drive-card .miles{font-family:'Lora',serif;font-size:17px;font-weight:600;color:var(--ochre);flex-shrink:0;}
+.util-card{background:var(--white);border:1px solid rgba(201,168,76,0.15);border-radius:var(--r-lg);padding:18px 16px;margin-bottom:14px;box-shadow:var(--shadow-sm);}
+.util-title{font-family:'Lora',serif;font-size:22px;font-weight:600;color:var(--ink);margin-bottom:4px;line-height:1.15;}
+.util-sub{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin-bottom:14px;}
+.fx-rate-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-3);margin-bottom:12px;padding:8px 12px;background:var(--paper-2);border-radius:var(--r-sm);border:1px solid rgba(201,168,76,0.15);}
+.fx-rate-row strong{color:var(--ink);}
+.fx-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.fx-row label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;width:36px;flex-shrink:0;}
+.fx-row input{flex:1;font:500 17px 'Poppins',sans-serif;font-variant-numeric:tabular-nums;padding:10px 12px;border:1px solid rgba(201,168,76,0.25);border-radius:var(--r-sm);background:var(--paper);color:var(--ink);outline:none;transition:border-color .15s;}
+.fx-row input:focus{border-color:var(--ochre);}
+.kv-list{display:grid;gap:8px;}
+.kv-item{display:grid;grid-template-columns:minmax(90px,auto) 1fr;gap:10px;font-size:13px;padding:8px 0;border-bottom:1px solid rgba(201,168,76,0.10);}
+.kv-item:last-child{border-bottom:0;}
+.kv-key{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ochre);font-weight:600;padding-top:1px;}
+.kv-val{color:var(--ink);font-weight:500;}
+.kv-val .sub{display:block;color:var(--ink-3);font-weight:400;font-size:12px;margin-top:2px;}
+.tip{background:var(--olive-soft);border-left:3px solid var(--olive);padding:10px 12px;font-size:12.5px;color:var(--ink-2);border-radius:0 var(--r-sm) var(--r-sm) 0;margin:12px 0;line-height:1.5;}
+.tip strong{color:var(--olive);}
+.alert{background:var(--red-soft);border-left:3px solid var(--red);padding:10px 12px;font-size:12.5px;color:var(--ink-2);border-radius:0 var(--r-sm) var(--r-sm) 0;margin:12px 0;line-height:1.5;}
+.alert strong{color:var(--red);}
+.booking-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(201,168,76,0.10);font-size:13px;gap:8px;}
+.booking-row:last-child{border-bottom:0;}
+.booking-row .name{font-weight:500;color:var(--ink);flex:1;min-width:0;}
+.booking-row .name .sub{display:block;font-weight:400;color:var(--ink-3);font-size:11.5px;margin-top:1px;}
+.etiq-item{padding:10px 0;border-bottom:1px solid rgba(201,168,76,0.10);}
+.etiq-item:last-child{border-bottom:0;}
+.etiq-item h4{font-family:'Lora',serif;font-size:16px;font-weight:600;color:var(--ochre);margin-bottom:3px;}
+.etiq-item p{font-size:13px;color:var(--ink-2);line-height:1.5;}
+.emerg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.emerg-call{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:18px 10px;background:var(--white);border:1px solid rgba(201,168,76,0.18);border-radius:var(--r-md);text-align:center;transition:transform .15s,box-shadow .15s;}
+.emerg-call:hover{transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.emerg-call:active{transform:scale(0.97);}
+.emerg-icon{font-size:26px;line-height:1;}
+.emerg-num{font-family:'Lora',serif;font-size:26px;font-weight:600;color:#1E1E1E;line-height:1;letter-spacing:.02em;}
+.emerg-label{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600;}
+.contact-card{background:var(--white);border:1px solid rgba(201,168,76,0.15);border-radius:var(--r-md);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:background .15s;}
+.contact-card:hover{background:var(--paper-2);}
+.contact-name{font-weight:600;font-size:14px;color:var(--ink);flex:1;min-width:0;}
+.contact-name .sub{display:block;font-weight:400;font-size:11.5px;color:var(--ink-3);margin-top:1px;}
+.contact-phone{font-family:'Lora',serif;font-size:16px;font-weight:600;color:var(--ochre);flex-shrink:0;letter-spacing:.02em;}
+.phrase{display:grid;grid-template-columns:1fr auto;gap:8px 12px;padding:10px 0;border-bottom:1px solid rgba(201,168,76,0.10);font-size:13px;}
+.phrase:last-child{border-bottom:0;}
+.phrase .en{color:var(--ink-3);font-style:italic;}
+.phrase .it{font-family:'Lora',serif;font-size:16px;font-weight:500;color:var(--ink);text-align:right;}
+.phrase .it small{display:block;color:var(--ink-3);font-size:11px;font-style:italic;margin-top:1px;}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#1E1E1E;color:var(--ochre);font-size:13px;font-weight:500;padding:10px 20px;border-radius:22px;border:1px solid var(--ochre);opacity:0;pointer-events:none;transition:all .22s cubic-bezier(0.4,0,0.2,1);z-index:999;white-space:nowrap;max-width:90vw;box-shadow:var(--shadow-lg);}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media(min-width:700px){
+  .header-top{padding:14px 32px 12px;}.tab-nav{padding:0 32px;}
+  .tab-btn{font-size:12px;padding:12px 20px;flex:none;}.brand-title{font-size:22px;}
+  #cest-clock{font-size:21px;}.tab-panel{padding:28px 28px 80px;max-width:920px;}
+  .hero-title{font-size:56px;}.day-strip{grid-template-columns:1fr 1fr;}
+  .emerg-grid{grid-template-columns:repeat(4,1fr);}.hotels-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
-
 </head>
+
 <body>
 
 <header id="app-header">
   <div class="header-top">
     <div class="brand">
-      <div class="brand-mark">🍷</div>
+      <div class="brand-mark">🇮🇹</div>
       <div class="brand-text">
         <div class="brand-title">Mini Italy 2026</div>
-        <div class="brand-sub">Happy Camper · 4–10 Aug</div>
+        <div class="brand-sub">Happy Camper · 4–10 August</div>
       </div>
     </div>
     <div class="clock-block">
@@ -969,915 +209,246 @@ a { color: var(--wine); text-decoration: none; }
 <script>
 'use strict';
 
-/* ═════════════════════════════════════════════════════════════
-   CONFIGURATION — edit these three values as needed
-   ═════════════════════════════════════════════════════════════ */
-const FX_GBP_PER_EUR = 0.855;   // ← UPDATE: GBP per 1 EUR
-const FX_USD_PER_EUR = 1.075;   // ← UPDATE: USD per 1 EUR
-const TIMEZONE       = 'Europe/Rome';   // CEST = UTC+2 in August
+const FX_GBP_PER_EUR = 0.855;
+const FX_CHF_PER_EUR = 0.960;
+const TIMEZONE = 'Europe/Paris';
 
-/* ═════════════════════════════════════════════════════════════
-   TRIP DATA — edit TRIP object to change itinerary content
-   ═════════════════════════════════════════════════════════════ */
 const TRIP = {
   tripTitle:  'Mini Italy 2026',
   traveler:   'Gerhard Huber',
   curator:    'Happy Camper Ltd.',
-  contact:    '+81 80 6989 2107',
-  email:      'hello@happycamper.food',
   startDate:  '2026-08-04',
   endDate:    '2026-08-10',
-  travelers:  2,
 
   hotels: [
-    { name: 'Castello di Guarene',          location: 'Guarene, Langhe (IT)',           nights: 'Tue 4 – Wed 5 Aug',  ref: '8565B13038440',  url: 'https://castellodiguarene.com',          phone: '+390173441332',    mapsQuery: 'Castello di Guarene Relais Chateaux' },
-    { name: 'Il Boscareto Resort & Spa',    location: 'Serralunga d’Alba (IT)',         nights: 'Wed 5 – Thu 6 Aug',  ref: '22836TCR3977',   url: 'https://ilboscaretoresort.it',           phone: '+390173613042',    mapsQuery: 'Il Boscareto Resort Serralunga d Alba' },
-    { name: 'Hostellerie Jérôme',           location: 'La Turbie, French Riviera (FR)', nights: 'Thu 6 – Fri 7 Aug',  ref: '—',              url: 'https://hostellerie-jerome.com',         phone: '+33492415151',     mapsQuery: 'Hostellerie Jerome La Turbie' },
-    { name: 'Hôtel & Spa du Castellet',     location: 'Le Castellet, Var (FR)',         nights: 'Fri 7 – Sat 8 Aug',  ref: 'SQNNWA',         url: 'https://hotelducastellet.net',           phone: '+33494983777',     mapsQuery: 'Hotel Spa du Castellet Le Castellet' },
-    { name: 'Hôtel du Golf · Vercors',      location: 'Corrençon-en-Vercors (FR)',      nights: 'Sat 8 – Sun 9 Aug',  ref: 'Demi-pension',   url: 'https://hotel-du-golf-vercors.fr',       phone: '+33476958484',     mapsQuery: 'Hotel du Golf Correncon en Vercors' },
-    { name: 'La Maison des Morainières',    location: 'Saint-Pierre-de-Curtille, Savoie (FR)', nights: 'Sun 9 – Mon 10 Aug', ref: '2-349630-3134', url: 'https://lamaisondesmorainieres.com', phone: '+33479440939',     mapsQuery: 'La Maison des Morainieres Jongieux' }
+    { name: 'Castello di Guarene — R&C', location: 'Guarene, Langhe, Italy',    nights: 'Tue 4 Aug',   mapsQuery: 'Castello di Guarene Relais Chateaux', phone: '+390173441332' },
+    { name: 'Il Boscareto Resort & Spa',  location: 'Serralunga d\'Alba, Italy', nights: 'Wed 5 Aug',   mapsQuery: 'Il Boscareto Resort Spa Serralunga',  phone: '+390173613042' },
+    { name: 'Grand Hotel del Mare',       location: 'Bordighera, Liguria',       nights: 'Thu 6 Aug',   mapsQuery: 'Grand Hotel del Mare Bordighera',     phone: '+390184262201' },
+    { name: 'Hôtel & Spa du Castellet',   location: 'Le Castellet, Var, France', nights: 'Fri 7 Aug',   mapsQuery: 'Hotel Spa du Castellet',              phone: '+33494983777'  },
+    { name: 'Park Hotel Grenoble',         location: 'Grenoble, France',          nights: 'Sat 8 Aug',   mapsQuery: 'Park Hotel Grenoble',                 phone: '+33476858123'  },
+    { name: 'La Maison des Morainières',  location: 'Saint-Pierre-de-Curtille',  nights: 'Sun 9 Aug',   mapsQuery: 'La Maison des Morainières Savoie',    phone: '+33479440939'  },
   ],
 
   days: [
-
-    /* ─── DAY 1 · Tue 4 Aug ─── Manchester → Langhe */
-    {
-      date: '2026-08-04', dayNum: 1, weekday: 'Tuesday 4 August',
-      city: 'Manchester → Langhe',
-      hotel: 'Castello di Guarene',
-      hotelMapsQuery: 'Castello di Guarene Relais Chateaux',
-      weatherCity: 'Alba',
-      note: 'Travel day. Arrive in the Langhe by late afternoon — settle into the castello for a quiet evening. Dinner is open / hotel.',
+    /* Day 1 */
+    { date: '2026-08-04', dayNum: 1, weekday: 'Tuesday 4 August',
+      city: 'Manchester → Milan → Guarene', hotel: 'Castello di Guarene', weatherCity: 'Turin',
+      note: 'easyJet MAN→MXP 10:55–14:10. Collect self-drive car at MXP. ~160 km south to the Langhe hills. Dinner at the castle\'s own restaurant.',
       stops: [
-        {
-          time: '10:55', title: 'easyJet EZY8733', subtitle: 'Manchester → Milan Malpensa',
-          type: 'flight', tag: 'Flight',
-          locationName: 'Manchester Airport (MAN)',
-          mapsQuery: 'Manchester Airport Terminal 1',
-          notes: 'Departure 10:55 · Arrival 14:10 · Economy · 2h 15m. <em>Status: not yet requested.</em>'
-        },
-        {
-          time: '14:10', title: 'Arrival — Milan Malpensa', subtitle: 'Pickup landside after baggage',
-          type: 'flight', tag: 'Arrival',
-          locationName: 'Milan Malpensa Airport (MXP)',
-          mapsQuery: 'Milan Malpensa Airport Terminal 1',
-          notes: 'Pre-arrange driver or pick up the hire car at the airport desk. Allow 30–40 min for baggage and exit.'
-        },
-        {
-          time: '~14:45', title: 'Drive: MXP → Castello di Guarene',
-          type: 'drive', tag: 'Transfer',
-          drive: { km: 185, hrs: '~2 h', via: 'A4 → A21 → A33' },
-          notes: 'Allow 2 hours. The last 20 km through the Langhe vineyards is the prettiest stretch of the day.'
-        },
-        {
-          time: '~16:45', title: 'Castello di Guarene', subtitle: 'Relais & Châteaux · Check-in',
-          type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: 'Castello di Guarene, Piazza Vittorio Emanuele II, Guarene CN',
-          mapsQuery: 'Castello di Guarene Relais Chateaux',
-          phone: '+390173441332',
-          notes: 'Confirmation <em>8565B13038440</em>. Flexible / refundable rate. Castle terrace overlooks the Langhe — golden hour is the moment.'
-        }
+        { time: '10:55', title: 'easyJet EZY — Manchester → Milan Malpensa', subtitle: 'MAN → MXP · dep 10:55 · arr 14:10', type: 'flight', tag: 'Flight', badge: 'Confirmed', badgeClass: 'confirmed', notes: '2h 15min · Economy. Land at MXP T2.' },
+        { time: '~14:30', title: 'Collect rental car — Milan Malpensa', subtitle: 'Self-drive · MXP car hire desks', type: 'drive', tag: 'Car', notes: 'Collect at the MXP arrivals car hire desks — allow 20 min. Car to be dropped at Turin Caselle (TRN) on Mon 10 Aug.' },
+        { time: '~14:50', title: 'Drive: Milan Malpensa → Castello di Guarene', subtitle: '~160 km · 1h 50 min · via A4–A21–SP3', type: 'drive', tag: 'Drive', drive: { km: 160, hrs: '1h 50 min', via: 'A4 → A21 → SP3' }, notes: 'Head south to Asti then local roads into the Langhe. The landscape shifts dramatically from motorway to vineyard hills.' },
+        { time: '~17:00', title: 'Castello di Guarene — Relais & Châteaux', subtitle: 'Check-in · Guarene, Langhe', type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed', locationName: 'Via Alessandro Roero 2, 12050 Guarene CN', mapsQuery: 'Castello di Guarene Relais Chateaux', phone: '+390173441332', web: 'https://castellodiguarene.com', notes: 'Ref: 8565B13038440. 17th-century castle with vineyard views, cave spa, and panoramic Tanaro valley terrace. Extraordinary Barolo cellar.' },
+        { time: 'Evening', title: 'Castello di Guarene — dinner', subtitle: 'Hotel restaurant', type: 'restaurant', tag: 'Dinner', notes: 'A relaxed first evening in the castle\'s own restaurant. Ask the sommelier to open a Barbaresco or Arneis from the Roero hills. Tomorrow is the most ambitious day at the table.' }
       ]
     },
-
-    /* ─── DAY 2 · Wed 5 Aug ─── Langhe · Alba & Serralunga */
-    {
-      date: '2026-08-05', dayNum: 2, weekday: 'Wednesday 5 August',
-      city: 'Langhe',
-      hotel: 'Il Boscareto Resort & Spa',
-      hotelMapsQuery: 'Il Boscareto Resort Serralunga d Alba',
-      weatherCity: 'Alba',
-      note: 'Two of the Langhe’s landmark tables in a single day. Slow morning at the castello, lunch in Alba, change hotel, dinner at La Rei.',
+    /* Day 2 */
+    { date: '2026-08-05', dayNum: 2, weekday: 'Wednesday 5 August',
+      city: 'Alba — Serralunga d\'Alba (Two ★★★ tables)', hotel: 'Il Boscareto Resort & Spa', weatherCity: 'Cuneo',
+      note: 'The most ambitious day: two three-star tables 15 km apart. Lunch at Piazza Duomo in Alba (12:30), dinner at La Rei Natura in Serralunga (19:30).',
       stops: [
-        {
-          time: 'Morning', title: 'Free time at Castello di Guarene',
-          type: 'hotel', tag: 'Leisure',
-          locationName: 'Castello di Guarene',
-          mapsQuery: 'Castello di Guarene Relais Chateaux',
-          notes: 'Slow breakfast on the terrace. Stroll the castle gardens or the village of Guarene before checkout.'
-        },
-        {
-          time: '~12:00', title: 'Drive: Guarene → Alba',
-          type: 'drive', tag: 'Transfer',
-          drive: { km: 10, hrs: '~15 min', via: 'SP3' },
-          notes: 'Park near Piazza Risorgimento — short walk to Piazza Duomo.'
-        },
-        {
-          time: '12:30', title: 'Piazza Duomo', subtitle: 'Lunch · 3-Michelin · Enrico Crippa',
-          type: 'restaurant', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: 'Piazza Risorgimento 4, 12051 Alba CN',
-          mapsQuery: 'Piazza Duomo Alba Crippa',
-          phone: '+390173366167',
-          web: 'https://piazzaduomoalba.it',
-          notes: 'For 2. <em>Booking line opens 1 May 2026 at 09:00 (1st of month, 4 months ahead) — book the moment it opens.</em>'
-        },
-        {
-          time: '~15:00', title: 'Drive: Alba → Serralunga d’Alba',
-          type: 'drive', tag: 'Transfer',
-          drive: { km: 15, hrs: '~25 min', via: 'SP3 → SP125' },
-          notes: 'Through Barolo and Castiglione Falletto — one of the world’s great wine drives.'
-        },
-        {
-          time: '~15:30', title: 'Il Boscareto Resort & Spa', subtitle: 'Check-in · Room + Dinner package',
-          type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: 'Via Roddino 21, 12050 Serralunga d’Alba CN',
-          mapsQuery: 'Il Boscareto Resort Serralunga d Alba',
-          phone: '+390173613042',
-          notes: 'Confirmation <em>22836TCR3977</em>. Booked together with dinner at La Rei Natura. Pool + spa are exceptional — afternoon swim before dinner is the move.'
-        },
-        {
-          time: '20:30', title: 'La Rei Natura', subtitle: 'Dinner · 2-Michelin · Michelangelo Mammoliti',
-          type: 'restaurant', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: 'Il Boscareto Resort, Serralunga d’Alba',
-          mapsQuery: 'La Rei Natura Mammoliti Serralunga',
-          phone: '+390173613042',
-          web: 'https://ilboscaretoresort.it',
-          notes: 'For 2. Booked together with the room — tasting menu format. Mammoliti’s vegetable-forward Piedmontese cuisine; one of Italy’s most distinctive plates.'
-        }
+        { time: '~11:45', title: 'Drive: Guarene → Alba', subtitle: '~10 km · 15 min', type: 'drive', tag: 'Drive', drive: { km: 10, hrs: '~15 min', via: 'SP7 local' }, notes: 'Park in central Alba — Piazza Duomo is in the pedestrian heart of the city.' },
+        { time: '12:30', title: 'Piazza Duomo', subtitle: 'Lunch · ★★★ Michelin · WB50 #39 · Chef Enrico Crippa', type: 'restaurant', badge: 'Confirmed', badgeClass: 'confirmed', locationName: 'Piazza Risorgimento 4, 12051 Alba CN', mapsQuery: 'Piazza Duomo ristorante Alba', phone: '+390173366167', web: 'https://piazzaduomoalba.it', notes: 'For 2. One of Italy\'s greatest tables — Crippa\'s cuisine is rooted in the kitchen garden and the Langhe seasons. Book 1 May at 09:00 sharp (reservations open 4 months ahead).' },
+        { time: '~15:30', title: 'Drive: Alba → Serralunga d\'Alba', subtitle: '~15 km · 20 min', type: 'drive', tag: 'Drive', drive: { km: 15, hrs: '~20 min', via: 'SP3 local' }, notes: 'South through the Barolo communes. Il Boscareto Resort sits at the crest of the Serralunga ridge.' },
+        { time: '~16:00', title: 'Il Boscareto Resort & Spa', subtitle: 'Check-in · Serralunga d\'Alba', type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed', locationName: 'Via Roddino 21, 12050 Serralunga d\'Alba CN', mapsQuery: 'Il Boscareto Resort Spa Serralunga', phone: '+390173613042', web: 'https://ilboscaretoresort.it', notes: 'Ref: 22836TCR3977. Book with La Rei Natura dinner package.' },
+        { time: '19:30', title: 'La Rei Natura — Michelangelo Mammoliti', subtitle: 'Dinner · ★★★ Michelin · at Il Boscareto', type: 'restaurant', badge: 'Confirmed', badgeClass: 'confirmed', locationName: 'Via Roddino 21, Serralunga d\'Alba', mapsQuery: 'La Rei Natura Mammoliti Boscareto', phone: '+390173613042', notes: 'For 2. Chef Mammoliti\'s extraordinary kitchen garden cuisine — wild herbs, ferments, and hyper-seasonal Piedmontese produce in a tasting menu of tremendous ambition. 50 metres from your room.' }
       ]
     },
-
-    /* ─── DAY 3 · Thu 6 Aug ─── Langhe → French Riviera */
-    {
-      date: '2026-08-06', dayNum: 3, weekday: 'Thursday 6 August',
-      city: 'Langhe → French Riviera',
-      hotel: 'Hostellerie Jérôme',
-      hotelMapsQuery: 'Hostellerie Jerome La Turbie',
-      weatherCity: 'Monaco',
-      note: 'Long driving morning — Italian Alps to the Mediterranean. Arrive La Turbie mid-afternoon; afternoon at leisure. Dinner at Casa Buono is currently <em>pending</em>.',
+    /* Day 3 */
+    { date: '2026-08-06', dayNum: 3, weekday: 'Thursday 6 August',
+      city: 'Serralunga → Ventimiglia → Bordighera', hotel: 'Grand Hotel del Mare', weatherCity: 'Imperia',
+      note: 'Drive south over the Ligurian Apennines to the coast. Dinner at Casa Buono in Trucco, 5 km inland from Ventimiglia. Overnight in Bordighera.',
       stops: [
-        {
-          time: '~09:00', title: 'Drive: Il Boscareto → La Turbie',
-          type: 'drive', tag: 'Transfer',
-          drive: { km: 280, hrs: '~3 h', via: 'A6 → A8 (Côte d’Azur)' },
-          notes: 'The A6/A8 corridor is the Riviera’s main artery — busy in August. Stop at Imperia or Ventimiglia for a coffee and a pasta lunch break.'
-        },
-        {
-          time: '~12:30', title: 'Lunch en route', subtitle: 'Open / driver’s choice',
-          type: 'restaurant', tag: 'Open',
-          notes: 'Suggestion: Imperia or Ventimiglia for a final Italian lunch before the border. Trattoria-level — light, since dinner is the event.'
-        },
-        {
-          time: '~15:00', title: 'Hostellerie Jérôme', subtitle: 'Check-in · La Turbie',
-          type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: '20 Rue Comte de Cessole, 06320 La Turbie',
-          mapsQuery: 'Hostellerie Jerome La Turbie',
-          phone: '+33492415151',
-          web: 'https://hostellerie-jerome.com',
-          notes: 'B&B rate. Same house as Casa Buono — village-perched above Monaco with one of the great Riviera views. Allow time on the terrace before dinner.'
-        },
-        {
-          time: '20:00', title: 'Casa Buono', subtitle: 'Dinner · La Turbie',
-          type: 'restaurant', badge: 'Pending', badgeClass: 'pending',
-          locationName: 'La Turbie, 06320',
-          mapsQuery: 'Casa Buono La Turbie',
-          phone: '+33492415151',
-          notes: 'For 2. <em>Awaiting confirmation — request sent for 8 May.</em> Modern Mediterranean by Antoine Verjus.'
-        }
+        { time: '~09:30', title: 'Drive: Boscareto → Trucco, Ventimiglia', subtitle: '~180 km · 2h 30 min · via A6–A10', type: 'drive', tag: 'Drive', drive: { km: 180, hrs: '2h 30 min', via: 'A6 → A10 Riviera dei Fiori' }, notes: 'South on A6 over the Apennines to Savona, then coastal A10 to Ventimiglia. 5 km inland up the Val Roja to the village of Trucco.' },
+        { time: '19:30', title: 'Casa Buono', subtitle: 'Dinner · ★ Michelin · OAD 337 · Chef Antonio Buono', type: 'restaurant', badge: 'Confirmed', badgeClass: 'confirmed', locationName: 'Corso Cuneo 28, Trucco, 18039 Ventimiglia IM', mapsQuery: 'Casa Buono ristorante Trucco Ventimiglia', phone: '+393405188538', web: 'https://ristorantecasabuono.com', notes: 'For 2. Antonio Buono trained at Mirazur under Mauro Colagreco. No à la carte — Orto e Mare tasting menu only, built around family garden and local suppliers each day. Earned its star in 2023. Open Wed–Sat only.' },
+        { time: '~21:30', title: 'Drive: Trucco → Bordighera', subtitle: '~12 km · 15 min', type: 'drive', tag: 'Drive', drive: { km: 12, hrs: '~15 min', via: 'SS20 → SS1' }, notes: '' },
+        { time: '~22:00', title: 'Grand Hotel del Mare', subtitle: 'Check-in · Bordighera', type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed', locationName: 'Via Portico della Punta 34, 18012 Bordighera IM', mapsQuery: 'Grand Hotel del Mare Bordighera', phone: '+390184262201', notes: '5-star clifftop resort on the Riviera seafront, 12 km from Trucco. Sea-view rooms, spa, private beach, Mediterranean panorama.' }
       ]
     },
-
-    /* ─── DAY 4 · Fri 7 Aug ─── Riviera → Le Castellet */
-    {
-      date: '2026-08-07', dayNum: 4, weekday: 'Friday 7 August',
-      city: 'La Turbie → Le Castellet',
-      hotel: 'Hôtel & Spa du Castellet',
-      hotelMapsQuery: 'Hotel Spa du Castellet Le Castellet',
-      weatherCity: 'Toulon',
-      note: 'Short driving day — coast road via Cassis if time allows. Afternoon at the Castellet spa; dinner with a terrace request.',
+    /* Day 4 */
+    { date: '2026-08-07', dayNum: 4, weekday: 'Friday 7 August',
+      city: 'Bordighera → Le Castellet, Provence', hotel: 'Hôtel & Spa du Castellet', weatherCity: 'Toulon',
+      note: 'Drive west along the Riviera through Monaco, Nice, and Cannes, then inland to the Var. Dinner at La Table du Castellet — a three-star room looking over the old racing circuit.',
       stops: [
-        {
-          time: '~10:30', title: 'Drive: La Turbie → Le Castellet',
-          type: 'drive', tag: 'Transfer',
-          drive: { km: 130, hrs: '~1 h 30', via: 'A8 → A50' },
-          notes: 'The A8/A50 is fastest. For the scenic line, exit at La Ciotat and follow the Route des Crêtes via Cassis — adds ~45 min, gains a great view.'
-        },
-        {
-          time: '~13:00', title: 'Hôtel & Spa du Castellet', subtitle: 'Check-in · Room only',
-          type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: '3001 Route des Hauts du Camp, 83330 Le Castellet',
-          mapsQuery: 'Hotel Spa du Castellet Le Castellet',
-          phone: '+33494983777',
-          web: 'https://hotelducastellet.net',
-          notes: 'Confirmation <em>SQNNWA</em>. Room only — lunch and afternoon at the spa / pool. The Castellet circuit is next door if motorsport is on the menu.'
-        },
-        {
-          time: 'Afternoon', title: 'Pool · Spa · Le Castellet village',
-          type: 'leisure', tag: 'Leisure',
-          notes: 'Hilltop village of Le Castellet (the medieval one, not the circuit) is a 10-minute drive — narrow lanes, a few galleries, a glass of rosé.'
-        },
-        {
-          time: '20:00', title: 'La Table du Castellet', subtitle: 'Dinner · Hotel restaurant',
-          type: 'restaurant', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: 'Hôtel & Spa du Castellet',
-          mapsQuery: 'La Table du Castellet',
-          phone: '+33494983777',
-          web: 'https://hotelducastellet.net',
-          notes: 'For 2. Confirmation <em>SQNNWA</em>. Thu–Sun dinner / Fri–Sun lunch. <em>Request the terrace table</em> when checking in.'
-        }
+        { time: '~09:30', title: 'Drive: Bordighera → La Ciotat', subtitle: '~190 km · 2h 15 min · via A10–A8', type: 'drive', tag: 'Drive', drive: { km: 190, hrs: '2h 15 min', via: 'A10 → A8, La Ciotat exit' }, notes: 'Depart by 09:30. West through Monaco, Nice, Cannes. Exit the A8 at La Ciotat for lunch.' },
+        { time: '12:30', title: 'Couleurs de Shimatani', subtitle: 'Lunch · Chef Shimatani · La Ciotat · French coastal cuisine', type: 'restaurant', badge: 'Pending', badgeClass: 'pending', locationName: '35 Rue Edgard Quinet, 13600 La Ciotat', mapsQuery: 'Couleurs de Shimatani La Ciotat', phone: '+33486189216', notes: 'For 2. <em>Waitlist position 4 — monitor for confirmation.</em> Chef Shimatani — a Japanese chef cooking refined French coastal cuisine in La Ciotat. A natural stop on the A8 between Bordighera and Le Castellet.' },
+        { time: '~14:00', title: 'Drive: La Ciotat → Le Castellet', subtitle: '~25 km · 30 min · via D559–D226', type: 'drive', tag: 'Drive', drive: { km: 25, hrs: '~30 min', via: 'D559 → D226' }, notes: 'Short inland drive from La Ciotat up to Le Castellet. Check in to Hôtel & Spa du Castellet.' },
+        { time: '~12:00', title: 'Hôtel & Spa du Castellet', subtitle: 'Check-in · Le Castellet, Var', type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed', locationName: '3001 Route des Hauts du Camp, 83330 Le Castellet', mapsQuery: 'Hotel Spa du Castellet', phone: '+33494983777', web: 'https://hotelducastellet.net', notes: 'Ref: SQNNWA. The resort of La Table — five-star in the heart of the Var. Afternoon at leisure in the medieval village before dinner.' },
+        { time: 'Evening', title: 'La Table du Castellet', subtitle: 'Dinner · ★★★ Michelin · OAD 45 · Chef Christophe Bacquié', type: 'restaurant', badge: 'Confirmed', badgeClass: 'confirmed', locationName: '3001 Route des Hauts du Camp, 83330 Le Castellet', mapsQuery: 'La Table du Castellet Bacquie', phone: '+33494983777', notes: 'For 2. Chef Bacquié\'s Provençal-Mediterranean mastery — fish from the Côte d\'Azur, local herbs, exceptional technical precision. The terrace view over the old circuit and vineyards is one of France\'s most beautiful restaurant settings.' }
       ]
     },
-
-    /* ─── DAY 5 · Sat 8 Aug ─── Le Castellet → Camargue → Vercors */
-    {
-      date: '2026-08-08', dayNum: 5, weekday: 'Saturday 8 August',
-      city: 'Le Castellet → Camargue → Vercors',
-      hotel: 'Hôtel du Golf · Vercors',
-      hotelMapsQuery: 'Hotel du Golf Correncon en Vercors',
-      weatherCity: 'Grenoble',
-      note: 'Big driving day. Camargue lunch at a one-star garden restaurant, then the long climb up to the Vercors. Dinner at Palégrié is currently <em>pending — phone-only booking</em>.',
+    /* Day 5 */
+    { date: '2026-08-08', dayNum: 5, weekday: 'Saturday 8 August',
+      city: 'Castellet → Arles → Autrans-Méaudre — Long day (~400 km)', hotel: 'Park Hotel Grenoble', weatherCity: 'Nimes',
+      note: 'The longest driving day. Depart 09:30. Lunch at La Chassagnette in the Camargue (12:00). Then north 280 km to the Vercors. Dinner at Palégrié Chez l\'Henri (19:30) — phone-only booking.',
       stops: [
-        {
-          time: '09:30', title: 'Depart Le Castellet → Arles',
-          type: 'drive', tag: 'Transfer',
-          drive: { km: 130, hrs: '~1 h 45', via: 'A50 → A52 → A8 → A54' },
-          notes: 'Aim for Arles by 11:45. Park at La Chassagnette — they have on-site parking inside the estate.'
-        },
-        {
-          time: '12:00', title: 'La Chassagnette', subtitle: 'Lunch · 1-Michelin · Camargue garden',
-          type: 'restaurant', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: 'Route du Sambuc, 13200 Arles',
-          mapsQuery: 'La Chassagnette Arles Sambuc',
-          phone: '+33490972696',
-          web: 'https://chassagnette.fr',
-          notes: 'For 2. Open every day 21 Jun – 21 Sep for lunch and dinner. Vegetable-driven — the kitchen garden <em>is</em> the menu. Camargue rosé pairing is the way.'
-        },
-        {
-          time: '~14:30', title: 'Drive: Arles → Autrans-Méaudre / Vercors',
-          type: 'drive', tag: 'Transfer',
-          drive: { km: 290, hrs: '~3 h 15', via: 'A54 → A7 → A48 → D531' },
-          notes: 'The long leg. Arrive at the hotel by 17:00. Last 30 km climbs steeply into the Vercors massif — beautiful but slow.'
-        },
-        {
-          time: '~17:30', title: 'Hôtel du Golf · Vercors', subtitle: 'Check-in · Demi-pension',
-          type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: 'Les Ritons, 38250 Corrençon-en-Vercors',
-          mapsQuery: 'Hotel du Golf Correncon en Vercors',
-          phone: '+33476958484',
-          web: 'https://hotel-du-golf-vercors.fr',
-          notes: 'Demi-pension rate (dinner included) — but the Palégrié dinner is the plan; flag at check-in to credit/swap. Mountain hotel in pine forest.'
-        },
-        {
-          time: '19:30', title: 'Palégrié Chez l’Henri', subtitle: 'Dinner · Mountain bistronomy',
-          type: 'restaurant', badge: 'Pending', badgeClass: 'pending',
-          locationName: '38112 Méaudre',
-          mapsQuery: 'Palegrie Chez l Henri Meaudre',
-          phone: '+33476460783',
-          web: 'https://palegrie.fr',
-          notes: 'For 2. <em>⚠ Phone-only booking — call +33 4 76 46 07 83. Very few tables; book ASAP.</em>'
-        }
+        { time: '~09:30', title: 'Drive: Le Castellet → Arles (La Chassagnette)', subtitle: '~120 km · 1h 20 min · via A50–A7', type: 'drive', tag: 'Drive', drive: { km: 120, hrs: '1h 20 min', via: 'A50 → A7 / N568' }, notes: 'Depart by 09:30 latest. West on A50 then north on A7. Exit for Arles and follow signs to the Camargue marshland.' },
+        { time: '12:00', title: 'La Chassagnette', subtitle: 'Lunch · ★ Michelin (Green Star) · Camargue · Chef Armand Arnal', type: 'restaurant', tag: 'Lunch', locationName: 'Route du Sambuc, 13200 Arles', mapsQuery: 'La Chassagnette ristorante Arles Camargue', phone: '+33490977096', notes: 'For 2. Confirmed. Chef Arnal\'s legendary garden-to-table restaurant in a converted sheepfold in the Camargue marshes. Almost everything grown on-site. Quiet, joyful, extraordinary. Green Michelin Star.' },
+        { time: '~14:00', title: 'Drive: Arles → Autrans-Méaudre en Vercors', subtitle: '~280 km · 3h 00 min · via A7–A49–D531', type: 'drive', tag: 'Drive', drive: { km: 280, hrs: '3h 00 min', via: 'A7 → A49 → D531 Vercors' }, notes: 'North through the Rhône valley, then climb the D531 into the Vercors massif. Check in to Park Hotel Grenoble (30 min from Palégrié).' },
+        { time: '~17:30', title: 'Park Hotel Grenoble', subtitle: 'Check-in · Grenoble', type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed', locationName: 'Grenoble, France', mapsQuery: 'Park Hotel Grenoble', phone: '+33476858123', notes: 'City hotel in Grenoble, gateway to the Alps. ~30 min from Palégrié.' },
+        { time: '~18:45', title: 'Drive: Grenoble → Autrans-Méaudre en Vercors', subtitle: '~30 km · 30 min', type: 'drive', tag: 'Drive', drive: { km: 30, hrs: '~30 min', via: 'D531' }, notes: 'Climb into the Vercors plateau.' },
+        { time: '19:30', title: 'Palégrié Chez l\'Henri', subtitle: 'Dinner · ★ Michelin · Vercors · Chef Guillaume Monjuré', type: 'restaurant', tag: 'Dinner', locationName: 'Autrans-Méaudre en Vercors, 38880', mapsQuery: 'Palegrie chez Henri Autrans Vercors', phone: '+33476460783', notes: 'For 2. Confirmed by phone. ☎ +33 4 76 46 07 83 — phone reservations only 11:00–12:30. Guillaume Monjuré\'s cooking celebrates the Vercors forests and mountain pastures in a relaxed family barn — extraordinary local cheese from the farm next door.' }
       ]
     },
-
-    /* ─── DAY 6 · Sun 9 Aug ─── Vercors → Savoie / Jongieux */
-    {
-      date: '2026-08-09', dayNum: 6, weekday: 'Sunday 9 August',
-      city: 'Vercors → Jongieux (Savoie)',
-      hotel: 'La Maison des Morainières',
-      hotelMapsQuery: 'La Maison des Morainieres Jongieux',
-      weatherCity: 'Chambery',
-      note: 'Easy morning, then up to Jongieux — the Savoie wine village above Lac du Bourget. Florence (the host) drives guests to and from Les Morainières.',
+    /* Day 6 */
+    { date: '2026-08-09', dayNum: 6, weekday: 'Sunday 9 August',
+      city: 'Grenoble → Jongieux, Savoie', hotel: 'La Maison des Morainières', weatherCity: 'Chambery',
+      note: 'Morning drive north to the Marestel vineyard above Jongieux. Lunch and/or dinner at Les Morainières — newly promoted to three stars in 2026. Florence (host) drives guests to the restaurant.',
       stops: [
-        {
-          time: '~10:30', title: 'Drive: Autrans → Jongieux',
-          type: 'drive', tag: 'Transfer',
-          drive: { km: 100, hrs: '~1 h 30', via: 'D531 → A48 → A43' },
-          notes: 'Down off the Vercors, around Grenoble, up the A43 to the Savoie. Last stretch via Yenne is along the Rhône.'
-        },
-        {
-          time: '~12:30', title: 'La Maison des Morainières', subtitle: 'Check-in · Boutique guesthouse',
-          type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: 'Lieu-dit Les Morainières, 73170 Jongieux',
-          mapsQuery: 'La Maison des Morainieres Jongieux',
-          phone: '+33479440939',
-          web: 'https://lamaisondesmorainieres.com',
-          notes: 'Confirmation <em>2-349630-3134</em>. B&B rate. Five-room boutique guesthouse on the slope above the restaurant — vineyard views, swimming pool, peace.'
-        },
-        {
-          time: 'Afternoon', title: 'Vineyards · Lac du Bourget',
-          type: 'leisure', tag: 'Leisure',
-          notes: 'Jongieux’s Roussette and Mondeuse vineyards are on the doorstep. Drive 15 min to Yenne or Aix-les-Bains for the lake.'
-        },
-        {
-          time: '~19:30', title: 'Florence drives you to Les Morainières',
-          type: 'drive', tag: 'Host transfer',
-          badge: 'Host', badgeClass: 'host',
-          drive: { km: 5, hrs: '~10 min', via: 'Vineyard road' },
-          notes: 'The guesthouse host Florence drives guests directly to the restaurant — and back after dinner. <em>No need to call a taxi.</em>'
-        },
-        {
-          time: '20:00', title: 'Les Morainières', subtitle: 'Dinner · 2-Michelin · Michaël Arnoult',
-          type: 'restaurant', badge: 'Confirmed', badgeClass: 'confirmed',
-          locationName: 'Lieu-dit Les Morainières, 73170 Jongieux',
-          mapsQuery: 'Les Morainieres Jongieux',
-          phone: '+33479440939',
-          web: 'https://les-morainieres.com',
-          notes: 'For 2. Open Thu–Sun. Hillside dining room cantilevered over the Roussette terraces — sunset over the Rhône valley is the moment.'
-        }
+        { time: '~09:30', title: 'Drive: Grenoble → Jongieux', subtitle: '~100 km · 1h 15 min · via A43', type: 'drive', tag: 'Drive', drive: { km: 100, hrs: '1h 15 min', via: 'A43 / D921' }, notes: 'North on A43 through the Bugey vineyards. Exit for Jongieux and climb the Marestel ridge.' },
+        { time: '~11:00', title: 'La Maison des Morainières', subtitle: 'Check-in · Saint-Pierre-de-Curtille, Savoie', type: 'hotel', badge: 'Confirmed', badgeClass: 'confirmed', locationName: 'Saint-Pierre-de-Curtille, 73310 Savoie', mapsQuery: 'La Maison des Morainières Savoie', phone: '+33479440939', web: 'https://lamaisondesmorainieres.com', notes: 'Ref: 2-349630-3134. Run by the Arnoult family — same as the restaurant. Florence drives guests to and from dinner so you may drink freely. Expect homemade brioche with pink pralines at breakfast.' },
+        { time: 'Lunch / Dinner', title: 'Les Morainières', subtitle: 'Table · ★★★ Michelin · Newly promoted 2026 · Chef Michaël Arnoult', type: 'restaurant', badge: 'Confirmed', badgeClass: 'confirmed', locationName: 'Route de Marestel, 73170 Jongieux', mapsQuery: 'Les Morainières ristorante Jongieux Savoie', phone: '+33479440939', notes: 'For 2. Confirmed. Chef Arnoult\'s newly crowned three-star menu celebrates Savoie — lake char, crayfish, langoustine, mountain game — from a panoramic terrace above the Rhône valley and the Alps. The wine list is a love letter to Savoie. Ask for a pairing with Altesse from Domaine Dupasquier — finest producer in the appellation, just below the restaurant. Open Thursday–Sunday.' }
       ]
     },
-
-    /* ─── DAY 7 · Mon 10 Aug ─── Departure */
-    {
-      date: '2026-08-10', dayNum: 7, weekday: 'Monday 10 August',
-      city: 'Jongieux → Turin → Salzburg',
-      hotel: '—',
-      weatherCity: 'Turin',
-      note: 'Departure day. Morning at leisure; drive to Turin Caselle for the early-afternoon flight. <em>Spreadsheet says depart 11:30 — for a 14:10 flight from TRN with 12:00 check-in, recommend leaving by 10:45 to be safe.</em>',
+    /* Day 7 */
+    { date: '2026-08-10', dayNum: 7, weekday: 'Monday 10 August',
+      city: 'Jongieux → Turin → Salzburg', hotel: '—', weatherCity: 'Turin',
+      note: 'Depart by 11:30. ~130 km to Turin Caselle Airport. Drop car at TRN by 13:00. Lufthansa TRN→SZG dep 14:10, arr 18:25.',
       stops: [
-        {
-          time: 'Morning', title: 'Breakfast at La Maison · checkout',
-          type: 'hotel', tag: 'Leisure',
-          notes: 'Settle the bill, last walk in the vineyard, then onwards.'
-        },
-        {
-          time: '~10:45', title: 'Drive: Jongieux → Turin Airport (TRN)',
-          type: 'drive', tag: 'Transfer',
-          drive: { km: 120, hrs: '~2 h', via: 'A43 → Tunnel du Fréjus → A32' },
-          notes: 'Via the Fréjus tunnel — toll roughly €60 each way. <em>Note:</em> The booking sheet lists 11:30 departure, but with the 12:00 check-in window it’s tight; 10:45 is the safer call.'
-        },
-        {
-          time: '14:10', title: 'Lufthansa LH1874', subtitle: 'Turin → Salzburg',
-          type: 'flight', tag: 'Flight',
-          locationName: 'Turin Airport (TRN) · Caselle',
-          mapsQuery: 'Turin Airport Caselle',
-          notes: 'Departure 14:10 · Arrival 18:25 · Economy · 4h 15m. <em>Status: not yet requested.</em>'
-        }
+        { time: '~11:30', title: 'Drive: Jongieux → Turin Caselle Airport (TRN)', subtitle: '~130 km · 1h 30 min · via A43–A5', type: 'drive', tag: 'Drive', drive: { km: 130, hrs: '1h 30 min', via: 'A43 → A5 / A32' }, notes: 'Depart no later than 11:30. South on A43 through the Bugey, then A5/A32 into Piedmont. Beautiful final stretch through the Alps.' },
+        { time: '~13:00', title: 'Drop car · Turin Caselle Airport (TRN)', subtitle: 'Return rental car · check-in by 12:00', type: 'drive', tag: 'Car', notes: 'Drop car at the TRN car hire returns. Allow 10 min for return. Check in by 12:00 latest.' },
+        { time: '14:10', title: 'Lufthansa LH — Turin → Salzburg', subtitle: 'TRN → SZG · dep 14:10 · arr 18:25', type: 'flight', tag: 'Flight', badge: 'Confirmed', badgeClass: 'confirmed', notes: 'Ref: 929UGG. 4h 15min · Economy. LH2383.' }
       ]
     }
-
-  ] // end days
-}; // end TRIP
-
-/* ═════════════════════════════════════════════════════════════
-   STATE
-   ═════════════════════════════════════════════════════════════ */
-let weatherCache = {};
-let activeTab = 'itinerary';
-
-/* ═════════════════════════════════════════════════════════════
-   HELPERS
-   ═════════════════════════════════════════════════════════════ */
-function $(sel, root) { return (root || document).querySelector(sel); }
-function $$(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
-
-function todayInTZ() {
-  // 'YYYY-MM-DD' in trip timezone
-  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' });
-  return fmt.format(new Date());
-}
-
-function toast(msg) {
-  const t = $('#toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => t.classList.remove('show'), 1900);
-}
-
-function copyText(text) {
-  try {
-    navigator.clipboard.writeText(text).then(() => toast('Copied ✓'), () => fallback());
-  } catch (e) { fallback(); }
-  function fallback() {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); toast('Copied ✓'); } catch (e) { toast('Could not copy'); }
-    document.body.removeChild(ta);
-  }
-}
-
-function mapsLink(query) {
-  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
-}
-function navLink(query) {
-  return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(query) + '&travelmode=driving';
-}
-
-/* ═════════════════════════════════════════════════════════════
-   CLOCK + TRIP-DAY LABEL
-   ═════════════════════════════════════════════════════════════ */
-function updateClock() {
-  const now = new Date();
-  const t = new Intl.DateTimeFormat('en-GB', {
-    timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit', hour12: false
-  }).format(now);
-  const clock = $('#cest-clock');
-  if (clock) clock.textContent = t;
-
-  // trip day label
-  const today = todayInTZ();
-  const start = TRIP.startDate, end = TRIP.endDate;
-  const lbl = $('#trip-day-label');
-  if (!lbl) return;
-
-  if (today < start) {
-    const days = Math.ceil((new Date(start) - new Date(today)) / 86400000);
-    lbl.textContent = days === 1 ? 'T-1 day · CEST' : `T-${days} days · CEST`;
-  } else if (today > end) {
-    lbl.textContent = 'Trip complete · CEST';
-  } else {
-    const dayIdx = Math.floor((new Date(today) - new Date(start)) / 86400000) + 1;
-    lbl.textContent = `Day ${dayIdx} of ${TRIP.days.length} · CEST`;
-  }
-}
-
-/* ═════════════════════════════════════════════════════════════
-   WEATHER — Open-Meteo (free, no API key required)
-   To swap for OpenWeatherMap, replace fetchWeather() and
-   set OWM_KEY = 'your_key_here' below.
-   ═════════════════════════════════════════════════════════════ */
-const CITY_COORDS = {
-  Alba:      { lat: 44.7009, lon: 8.0354 },
-  Monaco:    { lat: 43.7384, lon: 7.4246 },
-  Toulon:    { lat: 43.1242, lon: 5.9280 },
-  Grenoble:  { lat: 45.1885, lon: 5.7245 },
-  Chambery:  { lat: 45.5646, lon: 5.9178 },
-  Turin:     { lat: 45.0703, lon: 7.6869 }
+  ]
 };
 
-function wmoToEmoji(code) {
-  if (code === 0)                return { icon: '☀️', desc: 'Clear' };
-  if (code <= 2)                 return { icon: '⛅', desc: 'Partly cloudy' };
-  if (code === 3)                return { icon: '☁️', desc: 'Overcast' };
-  if (code >= 45 && code <= 48)  return { icon: '🌫️', desc: 'Foggy' };
-  if (code >= 51 && code <= 57)  return { icon: '🌦️', desc: 'Drizzle' };
-  if (code >= 61 && code <= 67)  return { icon: '🌧️', desc: 'Rain' };
-  if (code >= 80 && code <= 82)  return { icon: '🌦️', desc: 'Showers' };
-  if (code >= 95)                return { icon: '⛈️', desc: 'Storms' };
-  return { icon: '🌤️', desc: 'Mixed' };
+/* ─── Helpers ─────────────────────────────────────────────────────── */
+let weatherCache = {}, activeTab = 'itinerary';
+function $(s,r){return(r||document).querySelector(s);}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s));}
+function todayInTZ(){return new Intl.DateTimeFormat('en-CA',{timeZone:TIMEZONE,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),1900);}
+function copyText(t){try{navigator.clipboard.writeText(t).then(()=>toast('Copied ✓'),fb);}catch(e){fb();}function fb(){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('Copied ✓');}catch(e){toast('Could not copy');}document.body.removeChild(a);}}
+function mapsLink(q){return'https://maps.apple.com/?q='+encodeURIComponent(q);}
+function navLink(q){return'https://maps.apple.com/?daddr='+encodeURIComponent(q)+'&dirflg=d';}
+
+function updateClock(){
+  const t=new Intl.DateTimeFormat('en-GB',{timeZone:TIMEZONE,hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());
+  const c=$('#cest-clock');if(c)c.textContent=t;
+  const today=todayInTZ(),lbl=$('#trip-day-label');if(!lbl)return;
+  if(today<TRIP.startDate){const d=Math.ceil((new Date(TRIP.startDate)-new Date(today))/86400000);lbl.textContent=d===1?'T-1 day · CEST':`T-${d} days · CEST`;}
+  else if(today>TRIP.endDate){lbl.textContent='Trip complete · CEST';}
+  else{const idx=Math.floor((new Date(today)-new Date(TRIP.startDate))/86400000)+1;lbl.textContent=`Day ${idx} of ${TRIP.days.length} · CEST`;}
 }
 
-async function fetchWeather() {
-  const cities = Object.entries(CITY_COORDS);
-  const results = {};
-  await Promise.allSettled(cities.map(async ([city, { lat, lon }]) => {
-    try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
-        + `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode`
-        + `&timezone=Europe%2FRome&forecast_days=16`;
-      const res = await fetch(url);
-      const data = await res.json();
-      data.daily.time.forEach((date, i) => {
-        results[`${city}-${date}`] = {
-          max:  Math.round(data.daily.temperature_2m_max[i]),
-          min:  Math.round(data.daily.temperature_2m_min[i]),
-          rain: data.daily.precipitation_probability_max[i] ?? 0,
-          code: data.daily.weathercode[i]
-        };
-      });
-    } catch (e) { /* silent fail */ }
-  }));
-  return results;
-}
+const CITY_COORDS={Turin:{lat:45.0703,lon:7.6869},Cuneo:{lat:44.3842,lon:7.5427},Imperia:{lat:43.8872,lon:8.0310},Toulon:{lat:43.1242,lon:5.9280},Nimes:{lat:43.8367,lon:4.3601},Chambery:{lat:45.5646,lon:5.9178}};
+function wmoToEmoji(c){if(c===0)return{icon:'☀️',desc:'Clear'};if(c<=2)return{icon:'⛅',desc:'Partly cloudy'};if(c===3)return{icon:'☁️',desc:'Overcast'};if(c>=51&&c<=67)return{icon:'🌧️',desc:'Rain'};if(c>=80&&c<=82)return{icon:'🌦️',desc:'Showers'};if(c>=95)return{icon:'⛈️',desc:'Storms'};return{icon:'🌤️',desc:'Mixed'};}
+async function fetchWeather(){const r={};await Promise.allSettled(Object.entries(CITY_COORDS).map(async([city,{lat,lon}])=>{try{const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Europe%2FParis&forecast_days=16`;const d=await(await fetch(url)).json();d.daily.time.forEach((date,i)=>{r[`${city}-${date}`]={max:Math.round(d.daily.temperature_2m_max[i]),min:Math.round(d.daily.temperature_2m_min[i]),rain:d.daily.precipitation_probability_max[i]??0,code:d.daily.weathercode[i]};});}catch(e){}}));return r;}
+function weatherCellHTML(day){const w=weatherCache[`${day.weatherCity}-${day.date}`];if(!w)return`<span class="val" style="color:var(--ink-3)">Forecast within 16 days</span>`;const{icon,desc}=wmoToEmoji(w.code);return`<span class="val">${icon} ${w.min}°/${w.max}°C · ${desc} · ${w.rain}% rain</span>`;}
 
-function weatherCellHTML(day) {
-  const key = `${day.weatherCity}-${day.date}`;
-  const w = weatherCache[key];
-  if (!w) {
-    return `<span class="val" style="color:var(--ink-3)">Forecast available within 16 days of travel</span>`;
-  }
-  const { icon, desc } = wmoToEmoji(w.code);
-  return `<span class="val"><span class="weather-icon">${icon}</span> ${w.min}° / ${w.max}°C · ${desc} · ${w.rain}% rain</span>`;
-}
-
-/* ═════════════════════════════════════════════════════════════
-   RENDER — ITINERARY
-   ═════════════════════════════════════════════════════════════ */
-function renderItinerary() {
-  const root = $('#tab-itinerary');
-  const today = todayInTZ();
-
-  let html = '';
-
-  /* Hero */
-  html += `
-    <div class="hero">
-      <div class="hero-eyebrow">Private Travel · 2026</div>
-      <h1 class="hero-title">Mini <em>Italy</em></h1>
-      <div class="hero-sub">… and a glimpse of France</div>
-      <div class="hero-rule"></div>
-      <div class="hero-meta">
-        <span>🗓 <strong>4 – 10 Aug 2026</strong></span>
-        <span>🛬 <strong>MAN → MXP</strong></span>
-        <span>🛫 <strong>TRN → SZG</strong></span>
-        <span>🏨 <strong>6 hotels</strong></span>
-        <span>🍽 <strong>7 tables</strong></span>
-      </div>
-      <div class="hero-name">Gerhard Huber</div>
-      <div class="hero-name-sub">A Private Journey</div>
-    </div>
-  `;
-
-  /* Hotels summary */
-  html += `<div class="hotels-wrap">`;
-  html += `<div class="section-label">Hotels at a glance</div>`;
-  html += `<div class="hotels-grid">`;
-  TRIP.hotels.forEach((h, i) => {
-    html += `
-      <div class="hotel-card">
-        <div class="hotel-num">${i + 1}</div>
-        <div class="hotel-info">
-          <div class="hotel-name">${h.name}</div>
-          <div class="hotel-meta">${h.location} · ${h.nights}</div>
-        </div>
-        <a class="hotel-link" href="${mapsLink(h.mapsQuery)}" target="_blank" rel="noopener" aria-label="Map">↗</a>
-      </div>
-    `;
+function renderItinerary(){
+  const root=$('#tab-itinerary'),today=todayInTZ();let html='';
+  html+=`<div class="hero"><div class="hero-eyebrow">Private Travel · 2026</div><h1 class="hero-title">Mini <em>Italy</em></h1><div class="hero-sub">Langhe · Ligurian Riviera · Provence · Vercors · Savoie</div><div class="hero-rule"></div><div class="hero-meta"><span>🗓 <strong>4–10 Aug 2026</strong></span><span>✈️ <strong>MAN → MXP</strong></span><span>✈️ <strong>TRN → SZG</strong></span><span>🚗 <strong>Self-drive</strong></span><span>🏨 <strong>6 hotels</strong></span><span>🍽 <strong>7 restaurants</strong></span><span>📍 <strong>~1,200 km</strong></span></div><div class="hero-name">Gerhard Huber</div><div class="hero-name-sub">A Personal Journey · Happy Camper Ltd.</div></div>`;
+  html+=`<div class="section-label">Hotels at a glance</div><div class="hotels-grid">`;
+  TRIP.hotels.forEach((h,i)=>{html+=`<div class="hotel-card"><div class="hotel-num">${i+1}</div><div class="hotel-info"><div class="hotel-name">${h.name}</div><div class="hotel-meta">${h.location} · ${h.nights}</div></div><a class="hotel-link" href="${mapsLink(h.mapsQuery)}" target="_blank" rel="noopener">↗</a></div>`;});
+  html+=`</div><div class="section-label">Day by day</div><div id="days-container">`;
+  TRIP.days.forEach((d,di)=>{
+    const isCurrent=d.date===today,isPast=d.date<today,cls=['day-card'];
+    if(isCurrent)cls.push('is-current','expanded');if(isPast)cls.push('is-past');
+    if(di===0&&!isCurrent&&!isPast)cls.push('expanded');
+    html+=`<article class="${cls.join(' ')}" data-date="${d.date}"><button class="day-header" aria-expanded="${cls.includes('expanded')}" onclick="toggleDay(this)"><div class="day-num">${d.dayNum}</div><div class="day-meta"><div class="day-date">${d.weekday}</div><div class="day-title">${d.city}</div></div>${isCurrent?'<span class="day-city-badge">Today</span>':''}<span class="day-toggle">⌃</span></button><div class="day-body"><div class="day-strip"><div class="strip-item"><span class="label">Hotel</span>${d.hotel==='—'?'<span class="val" style="color:var(--ink-3)">Departure</span>':`<span class="val">${d.hotel}</span>`}</div><div class="strip-item" data-weather data-key="${d.weatherCity}-${d.date}"><span class="label">Weather</span>${weatherCellHTML(d)}</div></div>${d.note?`<div class="day-note">${d.note}</div>`:''}<div class="stops">${d.stops.map(stopHTML).join('')}</div></div></article>`;
   });
-  html += `</div></div>`;
-
-  /* Days */
-  html += `<div class="section-label">Day by day</div>`;
-  html += `<div id="days-container">`;
-  TRIP.days.forEach((d) => {
-    const isCurrent = d.date === today;
-    const isPast = d.date < today;
-    const cls = ['day-card'];
-    if (isCurrent) cls.push('is-current', 'expanded');
-    if (isPast) cls.push('is-past');
-    if (TRIP.days.indexOf(d) === 0 && !isCurrent && !isPast) cls.push('expanded');
-
-    html += `
-      <article class="${cls.join(' ')}" data-date="${d.date}">
-        <button class="day-header" aria-expanded="${cls.includes('expanded')}" onclick="toggleDay(this)">
-          <div class="day-num">${d.dayNum}</div>
-          <div class="day-meta">
-            <div class="day-date">${d.weekday}</div>
-            <div class="day-title">${d.city}</div>
-          </div>
-          ${isCurrent ? '<span class="day-city-badge">Today</span>' : ''}
-          <span class="day-toggle">⌃</span>
-        </button>
-        <div class="day-body">
-          <div class="day-strip">
-            <div class="strip-item"><span class="label">Hotel</span>${
-              d.hotel === '—'
-                ? '<span class="val" style="color:var(--ink-3)">Departure</span>'
-                : `<span class="val">${d.hotel}</span>`
-            }</div>
-            <div class="strip-item" data-weather data-key="${d.weatherCity}-${d.date}">
-              <span class="label">Weather</span>${weatherCellHTML(d)}
-            </div>
-          </div>
-          ${d.note ? `<div class="day-note">${d.note}</div>` : ''}
-          <div class="stops">
-            ${d.stops.map(stopHTML).join('')}
-          </div>
-        </div>
-      </article>
-    `;
-  });
-  html += `</div>`;
-
-  root.innerHTML = html;
+  html+=`</div>`;root.innerHTML=html;
 }
 
-function stopHTML(s) {
-  const tagBits = [];
-  if (s.tag) tagBits.push(`<span class="stop-type-tag">${s.tag}</span>`);
-  if (s.badge) tagBits.push(`<span class="badge ${s.badgeClass || ''}">${s.badge}</span>`);
-
-  const actions = [];
-  if (s.mapsQuery) {
-    actions.push(`<a class="act-btn" href="${mapsLink(s.mapsQuery)}" target="_blank" rel="noopener">📍 Map</a>`);
-    actions.push(`<a class="act-btn primary" href="${navLink(s.mapsQuery)}" target="_blank" rel="noopener">🧭 Navigate</a>`);
-  }
-  if (s.locationName || s.address) {
-    const addr = s.address || s.locationName;
-    actions.push(`<button class="act-btn" onclick="copyText(${JSON.stringify(addr).replace(/"/g, '&quot;')})">📋 Copy</button>`);
-  }
-  if (s.phone) {
-    actions.push(`<a class="act-btn tel" href="tel:${s.phone.replace(/\s+/g, '')}">📞 Call</a>`);
-  }
-  if (s.web) {
-    actions.push(`<a class="act-btn" href="${s.web}" target="_blank" rel="noopener">🌐 Site</a>`);
-  }
-
-  let driveBlock = '';
-  if (s.drive) {
-    driveBlock = `
-      <div class="drive-card">
-        <span class="miles">${s.drive.km} km</span>
-        <span>${s.drive.hrs}${s.drive.via ? ' · ' + s.drive.via : ''}</span>
-      </div>
-    `;
-  }
-
-  return `
-    <div class="stop" data-type="${s.type || 'leisure'}">
-      <div class="stop-header">
-        <span class="stop-time">${s.time || ''}</span>
-        ${tagBits.join('')}
-      </div>
-      <div class="stop-title">${s.title}</div>
-      ${s.subtitle ? `<div class="stop-subtitle">${s.subtitle}</div>` : ''}
-      ${driveBlock}
-      ${s.locationName ? `<div class="stop-loc">${s.locationName}</div>` : ''}
-      ${s.notes ? `<div class="stop-notes">${s.notes}</div>` : ''}
-      ${actions.length ? `<div class="stop-actions">${actions.join('')}</div>` : ''}
-    </div>
-  `;
+function stopHTML(s){
+  const tags=[];if(s.tag)tags.push(`<span class="stop-type-tag">${s.tag}</span>`);if(s.badge)tags.push(`<span class="badge ${s.badgeClass||''}">${s.badge}</span>`);
+  const acts=[];if(s.mapsQuery){acts.push(`<a class="act-btn" href="${mapsLink(s.mapsQuery)}" target="_blank">📍 Map</a>`);acts.push(`<a class="act-btn primary" href="${navLink(s.mapsQuery)}" target="_blank">🧭 Navigate</a>`);}
+  if(s.locationName)acts.push(`<button class="act-btn" onclick="copyText(${JSON.stringify(s.locationName).replace(/"/g,'&quot;')})">📋 Copy</button>`);
+  if(s.phone)acts.push(`<a class="act-btn tel" href="tel:${s.phone.replace(/\s+/g,'')}">📞 Call</a>`);
+  if(s.web)acts.push(`<a class="act-btn" href="${s.web}" target="_blank">🌐 Site</a>`);
+  let drive='';if(s.drive)drive=`<div class="drive-card"><span class="miles">${s.drive.km} km</span><span>${s.drive.hrs} · ${s.drive.via}</span></div>`;
+  return`<div class="stop" data-type="${s.type||'leisure'}"><div class="stop-header"><span class="stop-time">${s.time||''}</span>${tags.join('')}</div><div class="stop-title">${s.title}</div>${s.subtitle?`<div class="stop-subtitle">${s.subtitle}</div>`:''}${drive}${s.locationName?`<div class="stop-loc">${s.locationName}</div>`:''}${s.notes?`<div class="stop-notes">${s.notes}</div>`:''}${acts.length?`<div class="stop-actions">${acts.join('')}</div>`:''}</div>`;
 }
 
-function toggleDay(btn) {
-  const card = btn.closest('.day-card');
-  const open = card.classList.toggle('expanded');
-  btn.setAttribute('aria-expanded', open);
-}
+function toggleDay(btn){const card=btn.closest('.day-card'),open=card.classList.toggle('expanded');btn.setAttribute('aria-expanded',open);}
 
-/* ═════════════════════════════════════════════════════════════
-   RENDER — UTILITIES
-   ═════════════════════════════════════════════════════════════ */
-function renderUtilities() {
-  const root = $('#tab-utilities');
-  root.innerHTML = `
+function renderUtilities(){
+  $('#tab-utilities').innerHTML=`
+    <div class="util-card"><h2 class="util-title">Currency</h2><div class="util-sub">EUR ↔ GBP ↔ CHF</div>
+      <div class="fx-rate-row"><span>Rates: <strong>£${FX_GBP_PER_EUR}</strong> / <strong>₣${FX_CHF_PER_EUR}</strong> per €1</span></div>
+      <div class="fx-row"><label for="fx-eur">EUR</label><input id="fx-eur" type="number" inputmode="decimal" placeholder="100" oninput="convertFX('eur')"></div>
+      <div class="fx-row"><label for="fx-gbp">GBP</label><input id="fx-gbp" type="number" inputmode="decimal" placeholder="—" oninput="convertFX('gbp')"></div>
+      <div class="fx-row"><label for="fx-chf">CHF</label><input id="fx-chf" type="number" inputmode="decimal" placeholder="—" oninput="convertFX('chf')"></div></div>
 
-    <!-- CURRENCY -->
-    <div class="util-card">
-      <h2 class="util-title">Currency</h2>
-      <div class="util-sub">EUR ↔ GBP ↔ USD</div>
-      <div class="fx-rate-row">
-        <span>Rates: <strong>£${FX_GBP_PER_EUR}</strong> / <strong>$${FX_USD_PER_EUR}</strong> per €1</span>
-        <span class="fx-edit" onclick="alert('Edit FX_GBP_PER_EUR and FX_USD_PER_EUR in the script.')">edit</span>
-      </div>
-      <div class="fx-row">
-        <label for="fx-eur">EUR</label>
-        <input id="fx-eur" type="number" inputmode="decimal" placeholder="100" oninput="convertFX('eur')">
-      </div>
-      <div class="fx-row">
-        <label for="fx-gbp">GBP</label>
-        <input id="fx-gbp" type="number" inputmode="decimal" placeholder="—" oninput="convertFX('gbp')">
-      </div>
-      <div class="fx-row">
-        <label for="fx-usd">USD</label>
-        <input id="fx-usd" type="number" inputmode="decimal" placeholder="—" oninput="convertFX('usd')">
-      </div>
-    </div>
+    <div class="util-card"><h2 class="util-title">Booking tracker</h2><div class="util-sub">Status at a glance</div>
+      <div class="kv-key" style="margin-top:6px;">Confirmed ✅</div>
+      <div class="booking-row"><div class="name">easyJet MAN → MXP<span class="sub">Tue 4 Aug · dep 10:55 · Economy</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">Lufthansa TRN → SZG<span class="sub">Mon 10 Aug · dep 14:10 · Ref 929UGG</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">Castello di Guarene — R&C<span class="sub">Tue 4 Aug · Ref 8565B13038440</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">Il Boscareto Resort & Spa<span class="sub">Wed 5 Aug · Ref 22836TCR3977</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">Grand Hotel del Mare, Bordighera<span class="sub">Thu 6 Aug</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">Hôtel & Spa du Castellet<span class="sub">Fri 7 Aug · Ref SQNNWA</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">Park Hotel Grenoble<span class="sub">Sat 8 Aug</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">La Maison des Morainières<span class="sub">Sun 9 Aug · Ref 2-349630-3134</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">Piazza Duomo ★★★<span class="sub">Wed 5 Aug · Lunch 12:30 · Alba</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">La Rei Natura — Mammoliti ★★★<span class="sub">Wed 5 Aug · Dinner 19:30 · Serralunga</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">Casa Buono ★<span class="sub">Thu 6 Aug · Dinner 19:30 · Trucco</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">La Table du Castellet ★★★<span class="sub">Fri 7 Aug · Dinner · Le Castellet</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">Couleurs de Shimatani<span class="sub">Fri 7 Aug · Lunch 12:30 · La Ciotat · Waitlist #4</span></div><span class="badge pending">Pending</span></div>
+      <div class="booking-row"><div class="name">La Chassagnette ★ (Green)<span class="sub">Sat 8 Aug · Lunch 12:00 · Arles</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="booking-row"><div class="name">Les Morainières ★★★<span class="sub">Sun 9 Aug · Lunch/Dinner · Jongieux</span></div><span class="badge confirmed">Confirmed</span></div>
+      <div class="kv-key" style="margin-top:14px;">Pending ⚠️</div>
+      <div class="booking-row"><div class="name">Palégrié Chez l'Henri ★<span class="sub">Sat 8 Aug · Dinner 19:30 · Autrans · Phone only: +33 4 76 46 07 83</span></div><span class="badge pending">Pending</span></div>
+      <div class="booking-row"><div class="name">Rental car — MXP pick-up / TRN drop-off<span class="sub">Tue 4 Aug 14:30 → Mon 10 Aug 13:00</span></div><span class="badge pending">Pending</span></div>
+      <div class="alert" style="margin-top:12px;"><strong>⚠ Palégrié:</strong> Phone reservations only · +33 4 76 46 07 83 · Call 11:00–12:30 only.<br><strong>⚠ Piazza Duomo:</strong> Book 1 May at 09:00 sharp — opens 4 months ahead, first of month.</div></div>
 
-    <!-- BOOKING TRACKER -->
-    <div class="util-card">
-      <h2 class="util-title">Booking tracker</h2>
-      <div class="util-sub">Status across the trip</div>
-
-      <div class="kv-key" style="margin-top:6px;">Restaurants</div>
-      <div class="booking-row"><div class="name">Piazza Duomo<span class="sub">Wed 5 Aug · 12:30</span></div><span class="badge confirmed">Confirmed</span></div>
-      <div class="booking-row"><div class="name">La Rei Natura<span class="sub">Wed 5 Aug · 20:30</span></div><span class="badge confirmed">Confirmed</span></div>
-      <div class="booking-row"><div class="name">Casa Buono<span class="sub">Thu 6 Aug · evening</span></div><span class="badge pending">Pending</span></div>
-      <div class="booking-row"><div class="name">La Table du Castellet<span class="sub">Fri 7 Aug · 20:00</span></div><span class="badge confirmed">Confirmed</span></div>
-      <div class="booking-row"><div class="name">La Chassagnette<span class="sub">Sat 8 Aug · 12:00</span></div><span class="badge confirmed">Confirmed</span></div>
-      <div class="booking-row"><div class="name">Palégrié Chez l’Henri<span class="sub">Sat 8 Aug · 19:30</span></div><span class="badge pending">Pending</span></div>
-      <div class="booking-row"><div class="name">Les Morainières<span class="sub">Sun 9 Aug · 20:00</span></div><span class="badge confirmed">Confirmed</span></div>
-
-      <div class="kv-key" style="margin-top:14px;">Flights · Cars</div>
-      <div class="booking-row"><div class="name">easyJet EZY8733 · MAN→MXP<span class="sub">Tue 4 Aug · 10:55</span></div><span class="badge priority">Action</span></div>
-      <div class="booking-row"><div class="name">Lufthansa LH1874 · TRN→SZG<span class="sub">Mon 10 Aug · 14:10</span></div><span class="badge priority">Action</span></div>
-      <div class="booking-row"><div class="name">Private cars · all transfers<span class="sub">8 legs · 1230 km total</span></div><span class="badge priority">Action</span></div>
-
-      <div class="alert" style="margin-top:14px;">
-        <strong>Priority actions:</strong>
-        (1) <strong>Piazza Duomo</strong> — set a reminder for <strong>1 May 2026 · 09:00</strong> (booking opens).
-        (2) <strong>Palégrié</strong> — call <a href="tel:+33476460783">+33 4 76 46 07 83</a> (phone only, no email/online).
-        (3) <strong>La Table du Castellet</strong> &amp; <strong>Les Morainières</strong> — high August demand, book ASAP.
-      </div>
-    </div>
-
-    <!-- DRIVING -->
-    <div class="util-card">
-      <h2 class="util-title">Driving notes</h2>
-      <div class="util-sub">Italy · France · 1230 km in 7 days</div>
+    <div class="util-card"><h2 class="util-title">Driving notes</h2><div class="util-sub">Self-drive · ~1,200 km · 7 days</div>
       <div class="kv-list">
-        <div class="kv-item"><span class="kv-key">Tolls</span><span class="kv-val">Italy: Telepass / cash. France: pay-by-card at most barriers. Budget €120–150 in tolls + €60 for the Fréjus tunnel.</span></div>
-        <div class="kv-item"><span class="kv-key">Fuel</span><span class="kv-val">Petrol €1.85–2.00/L (Italy), €1.90–2.10/L (France). Self-service stations stay open later than staffed ones.</span></div>
-        <div class="kv-item"><span class="kv-key">ZTLs</span><span class="kv-val">Limited-traffic zones in Alba and Italian centres — park outside the historic core, walk in. Cameras catch unauthorised plates and fine retroactively.</span></div>
-        <div class="kv-item"><span class="kv-key">Crit'Air</span><span class="kv-val">Grenoble has a permanent low-emission zone. If hire car is foreign-plated, request a Crit'Air sticker from the rental company.</span></div>
-        <div class="kv-item"><span class="kv-key">Speed limits</span><span class="kv-val">Italy autostrada 130 km/h · France autoroute 130 (110 in rain). Both countries: speed cameras everywhere.</span></div>
-        <div class="kv-item"><span class="kv-key">Vignette</span><span class="kv-val">Not needed for Italy or France. Switzerland would require one — none on this routing.</span></div>
-      </div>
-      <div class="tip">
-        <strong>One-way rental:</strong> book through Hertz Gold or Avis Prestige at MXP with TRN drop-off. Premium suppliers handle northern-Italy ↔ France one-ways with manageable fees; budget chains often refuse.
-      </div>
-    </div>
-
-    <!-- DINING ETIQUETTE -->
-    <div class="util-card">
-      <h2 class="util-title">Dining notes</h2>
-      <div class="util-sub">Italy · France</div>
-
-      <div class="etiq-item">
-        <h4>Punctuality at Michelin tables</h4>
-        <p>Italy and France both run tasting menus on a single seating. Aim for <strong>10 minutes early</strong> — arriving late, especially at Piazza Duomo or Les Morainières, throws the kitchen’s timing.</p>
-      </div>
-      <div class="etiq-item">
-        <h4>Tipping</h4>
-        <p><strong>Italy:</strong> service is included; rounding up or leaving €5–10 on a great meal is appreciated, not expected. <strong>France:</strong> service compris by law; an extra 5–10% in cash for excellent service is the norm at this level.</p>
-      </div>
-      <div class="etiq-item">
-        <h4>Coperto</h4>
-        <p>In Italy, expect a small <em>coperto</em> (cover charge, €3–8) on the bill. It covers bread and table setting — standard, not a tip.</p>
-      </div>
-      <div class="etiq-item">
-        <h4>Wine pairings</h4>
-        <p>Always offered at this level. At La Rei, La Chassagnette, and Les Morainières, the local pairing (Langhe / Camargue / Roussette) is the signature — strongly recommended.</p>
-      </div>
-      <div class="etiq-item">
-        <h4>Dress</h4>
-        <p>Smart casual at every table on this trip — collared shirt, no shorts, closed shoes. Le Castellet leans more polished; the mountain tables (Palégrié, Hôtel du Golf) are relaxed.</p>
-      </div>
-    </div>
-
-    <!-- TRAVEL UTILITIES -->
-    <div class="util-card">
-      <h2 class="util-title">Travel utilities</h2>
-      <div class="util-sub">Practical information</div>
-      <div class="kv-list">
-        <div class="kv-item"><span class="kv-key">Power</span><span class="kv-val">Italy: type C, F, L (230V). France: type C, E (230V). UK plug needs an adapter for both.</span></div>
-        <div class="kv-item"><span class="kv-key">Time zone</span><span class="kv-val">CEST (UTC+2) throughout. UK is one hour behind.</span></div>
-        <div class="kv-item"><span class="kv-key">eSIM</span><span class="kv-val">Airalo / HolaFly / GigSky regional Europe plans cover both countries. EU roaming on a UK plan post-Brexit usually means daily fees — eSIM is cheaper.</span></div>
-        <div class="kv-item"><span class="kv-key">Cash</span><span class="kv-val">Carry €200–300 for tolls, parking, mountain restaurants. Palégrié in particular may be card-shy.</span></div>
-        <div class="kv-item"><span class="kv-key">Insurance</span><span class="kv-val">UK GHIC / EHIC valid in both countries for emergencies. Comprehensive travel insurance recommended given the driving distances.</span></div>
-        <div class="kv-item"><span class="kv-key">Languages</span><span class="kv-val">English fluent at every hotel and restaurant on this trip. A few Italian / French words go a long way (see Emergency tab).</span></div>
-      </div>
-    </div>
-
-  `;
-  // wire up converter
+        <div class="kv-item"><span class="kv-key">Car</span><span class="kv-val">Self-drive rental — collect MXP after 14:10 landing. Drop-off TRN by 13:00 Mon 10 Aug. Book via Hertz Gold or Avis Prestige for one-way Italy→France.</span></div>
+        <div class="kv-item"><span class="kv-key">Longest day</span><span class="kv-val">Sat 8 Aug: ~400 km total (Castellet → Arles → Grenoble/Vercors). Depart 09:30 sharp.</span></div>
+        <div class="kv-item"><span class="kv-key">Italy tolls</span><span class="kv-val">A6 and A10 are tolled. Pay by card at barriers. Budget €30–40 Italy section.</span></div>
+        <div class="kv-item"><span class="kv-key">France tolls</span><span class="kv-val">A8 (Riviera) and A7 (Rhône) are tolled. Approx €40–60 France section.</span></div>
+        <div class="kv-item"><span class="kv-key">Palégrié access</span><span class="kv-val">Autrans-Méaudre is at 1,050m elevation. D531 road from Grenoble is well-surfaced but winding. Allow 30 min from the city.</span></div>
+        <div class="kv-item"><span class="kv-key">La Maison driver</span><span class="kv-val">Florence Arnoult (the host) drives guests to and from Les Morainières — confirm on arrival. Leave the car at the house and drink freely.</span></div></div></div>`;
   setupFX();
 }
 
-/* ═════════════════════════════════════════════════════════════
-   RENDER — EMERGENCY
-   ═════════════════════════════════════════════════════════════ */
-function renderEmergency() {
-  const root = $('#tab-emergency');
-  root.innerHTML = `
-
-    <div class="util-card">
-      <h2 class="util-title">Emergency · One tap</h2>
-      <div class="util-sub">112 works EU-wide</div>
+function renderEmergency(){
+  $('#tab-emergency').innerHTML=`
+    <div class="util-card"><h2 class="util-title">Emergency · One tap</h2><div class="util-sub">112 works in Italy and France</div>
       <div class="emerg-grid">
-        <a class="emerg-call" href="tel:112">
-          <span class="emerg-icon">🆘</span>
-          <span class="emerg-num">112</span>
-          <span class="emerg-label">Europe-wide</span>
-        </a>
-        <a class="emerg-call" href="tel:113">
-          <span class="emerg-icon">🚓</span>
-          <span class="emerg-num">113</span>
-          <span class="emerg-label">Police IT</span>
-        </a>
-        <a class="emerg-call" href="tel:118">
-          <span class="emerg-icon">🚑</span>
-          <span class="emerg-num">118</span>
-          <span class="emerg-label">Medical IT</span>
-        </a>
-        <a class="emerg-call" href="tel:15">
-          <span class="emerg-icon">🚑</span>
-          <span class="emerg-num">15</span>
-          <span class="emerg-label">SAMU FR</span>
-        </a>
-        <a class="emerg-call" href="tel:17">
-          <span class="emerg-icon">🚓</span>
-          <span class="emerg-num">17</span>
-          <span class="emerg-label">Police FR</span>
-        </a>
-        <a class="emerg-call" href="tel:18">
-          <span class="emerg-icon">🚒</span>
-          <span class="emerg-num">18</span>
-          <span class="emerg-label">Fire FR</span>
-        </a>
-        <a class="emerg-call" href="tel:115">
-          <span class="emerg-icon">🚒</span>
-          <span class="emerg-num">115</span>
-          <span class="emerg-label">Fire IT</span>
-        </a>
-        <a class="emerg-call" href="tel:+393331122334">
-          <span class="emerg-icon">🛣️</span>
-          <span class="emerg-num">803116</span>
-          <span class="emerg-label">ACI tow IT</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="util-card">
-      <h2 class="util-title">Hotel direct lines</h2>
-      <div class="util-sub">Speed-dial all six houses</div>
-      <a class="contact-card" href="tel:+390173441332"><div class="contact-name">Castello di Guarene<span class="sub">Tue 4 Aug · IT</span></div><span class="contact-phone">+39 0173 441332</span></a>
-      <a class="contact-card" href="tel:+390173613042"><div class="contact-name">Il Boscareto Resort<span class="sub">Wed 5 Aug · IT</span></div><span class="contact-phone">+39 0173 613042</span></a>
-      <a class="contact-card" href="tel:+33492415151"><div class="contact-name">Hostellerie Jérôme<span class="sub">Thu 6 Aug · FR</span></div><span class="contact-phone">+33 4 92 41 51 51</span></a>
-      <a class="contact-card" href="tel:+33494983777"><div class="contact-name">Hôtel &amp; Spa du Castellet<span class="sub">Fri 7 Aug · FR</span></div><span class="contact-phone">+33 4 94 98 37 77</span></a>
-      <a class="contact-card" href="tel:+33476958484"><div class="contact-name">Hôtel du Golf · Vercors<span class="sub">Sat 8 Aug · FR</span></div><span class="contact-phone">+33 4 76 95 84 84</span></a>
-      <a class="contact-card" href="tel:+33479440939"><div class="contact-name">La Maison des Morainières<span class="sub">Sun 9 Aug · FR</span></div><span class="contact-phone">+33 4 79 44 09 39</span></a>
-    </div>
-
-    <div class="util-card">
-      <h2 class="util-title">Hospitals · 24h</h2>
-      <div class="util-sub">Closest to each base</div>
-      <div class="kv-list">
-        <div class="kv-item"><span class="kv-key">Langhe</span><span class="kv-val">Ospedale Michele e Pietro Ferrero · Verduno (CN) · <a href="tel:+390172420111">+39 0172 420111</a><span class="sub">~25 min from Guarene / Serralunga</span></span></div>
-        <div class="kv-item"><span class="kv-key">Riviera</span><span class="kv-val">Centre Hospitalier Princesse Grace · Monaco · <a href="tel:+37797989900">+377 97 98 99 00</a><span class="sub">~10 min from La Turbie</span></span></div>
-        <div class="kv-item"><span class="kv-key">Var</span><span class="kv-val">Hôpital Sainte-Musse · Toulon · <a href="tel:+33494145050">+33 4 94 14 50 50</a><span class="sub">~25 min from Le Castellet</span></span></div>
-        <div class="kv-item"><span class="kv-key">Vercors</span><span class="kv-val">CHU Grenoble Alpes · La Tronche · <a href="tel:+33476765075">+33 4 76 76 50 75</a><span class="sub">~45 min from Autrans</span></span></div>
-        <div class="kv-item"><span class="kv-key">Savoie</span><span class="kv-val">Centre Hospitalier Métropole Savoie · Chambéry · <a href="tel:+33479960500">+33 4 79 96 05 00</a><span class="sub">~30 min from Jongieux</span></span></div>
-      </div>
-    </div>
-
-    <div class="util-card">
-      <h2 class="util-title">Happy Camper · Concierge</h2>
-      <div class="util-sub">For anything, any time</div>
-      <a class="contact-card" href="tel:+818069892107"><div class="contact-name">Gerhard<span class="sub">Direct line (Japan number)</span></div><span class="contact-phone">+81 80 6989 2107</span></a>
-      <a class="contact-card" href="mailto:hello@happycamper.food"><div class="contact-name">hello@happycamper.food<span class="sub">Email</span></div><span class="contact-phone">✉</span></a>
-    </div>
-
-    <div class="util-card">
-      <h2 class="util-title">UK consular</h2>
-      <div class="util-sub">In case of lost passport / serious incident</div>
-      <a class="contact-card" href="tel:+390242030450"><div class="contact-name">UK Consulate · Milan<span class="sub">Via San Paolo 7</span></div><span class="contact-phone">+39 02 4203 0450</span></a>
-      <a class="contact-card" href="tel:+33144513100"><div class="contact-name">UK Embassy · Paris<span class="sub">35 Rue du Faubourg Saint-Honoré</span></div><span class="contact-phone">+33 1 44 51 31 00</span></a>
-      <a class="contact-card" href="tel:+33491155010"><div class="contact-name">UK Consulate · Marseille<span class="sub">Cabinet — Riviera + Provence</span></div><span class="contact-phone">+33 4 91 15 50 10</span></a>
-    </div>
-
-    <div class="util-card">
-      <h2 class="util-title">Useful phrases</h2>
-      <div class="util-sub">Italian · French</div>
-      <div class="phrase"><span class="en">Hello / Goodbye</span><span class="it">Buongiorno / Arrivederci<small>Bonjour / Au revoir</small></span></div>
-      <div class="phrase"><span class="en">Thank you</span><span class="it">Grazie<small>Merci</small></span></div>
-      <div class="phrase"><span class="en">A table for two</span><span class="it">Un tavolo per due<small>Une table pour deux</small></span></div>
-      <div class="phrase"><span class="en">The bill, please</span><span class="it">Il conto, per favore<small>L’addition, s’il vous plaît</small></span></div>
-      <div class="phrase"><span class="en">It was excellent</span><span class="it">Era squisito<small>C’était excellent</small></span></div>
-      <div class="phrase"><span class="en">Sorry / Excuse me</span><span class="it">Scusi<small>Pardon / Excusez-moi</small></span></div>
-      <div class="phrase"><span class="en">Where is the toilet?</span><span class="it">Dov’è il bagno?<small>Où sont les toilettes ?</small></span></div>
-      <div class="phrase"><span class="en">Help!</span><span class="it">Aiuto!<small>Au secours !</small></span></div>
-    </div>
-
-  `;
+        <a class="emerg-call" href="tel:112"><span class="emerg-icon">🆘</span><span class="emerg-num">112</span><span class="emerg-label">EU Emergency</span></a>
+        <a class="emerg-call" href="tel:113"><span class="emerg-icon">🚓</span><span class="emerg-num">113</span><span class="emerg-label">Police (IT)</span></a>
+        <a class="emerg-call" href="tel:17"><span class="emerg-icon">🚓</span><span class="emerg-num">17</span><span class="emerg-label">Police (FR)</span></a>
+        <a class="emerg-call" href="tel:15"><span class="emerg-icon">🚑</span><span class="emerg-num">15</span><span class="emerg-label">SAMU (FR)</span></a>
+        <a class="emerg-call" href="tel:118"><span class="emerg-icon">🚑</span><span class="emerg-num">118</span><span class="emerg-label">Ambulance (IT)</span></a>
+        <a class="emerg-call" href="tel:18"><span class="emerg-icon">🚒</span><span class="emerg-num">18</span><span class="emerg-label">Fire (FR)</span></a>
+        <a class="emerg-call" href="tel:803116"><span class="emerg-icon">🛣️</span><span class="emerg-num">803116</span><span class="emerg-label">ACI Italy</span></a>
+        <a class="emerg-call" href="tel:3946"><span class="emerg-icon">🛣️</span><span class="emerg-num">3946</span><span class="emerg-label">Autoroutes FR</span></a></div></div>
+    <div class="util-card"><h2 class="util-title">Hotel direct lines</h2><div class="util-sub">All 6 properties</div>
+      <a class="contact-card" href="tel:+390173441332"><div class="contact-name">Castello di Guarene<span class="sub">Tue 4 Aug · Guarene, Langhe</span></div><span class="contact-phone">+39 0173 441332</span></a>
+      <a class="contact-card" href="tel:+390173613042"><div class="contact-name">Il Boscareto Resort<span class="sub">Wed 5 Aug · Serralunga d'Alba</span></div><span class="contact-phone">+39 0173 613042</span></a>
+      <a class="contact-card" href="tel:+390184262201"><div class="contact-name">Grand Hotel del Mare<span class="sub">Thu 6 Aug · Bordighera</span></div><span class="contact-phone">+39 0184 262201</span></a>
+      <a class="contact-card" href="tel:+33494983777"><div class="contact-name">Hôtel & Spa du Castellet<span class="sub">Fri 7 Aug · Le Castellet</span></div><span class="contact-phone">+33 4 94 98 37 77</span></a>
+      <a class="contact-card" href="tel:+33476858123"><div class="contact-name">Park Hotel Grenoble<span class="sub">Sat 8 Aug · Grenoble</span></div><span class="contact-phone">+33 4 76 85 81 23</span></a>
+      <a class="contact-card" href="tel:+33479440939"><div class="contact-name">La Maison des Morainières<span class="sub">Sun 9 Aug · Jongieux, Savoie</span></div><span class="contact-phone">+33 4 79 44 09 39</span></a></div>
+    <div class="util-card"><h2 class="util-title">Happy Camper · Concierge</h2><div class="util-sub">For anything, any time</div>
+      <a class="contact-card" href="tel:+818069892107"><div class="contact-name">Gerhard · Japan<span class="sub">Japan mobile</span></div><span class="contact-phone">+81 80 6989 2107</span></a>
+      <a class="contact-card" href="tel:+447900683683"><div class="contact-name">Gerhard · UK<span class="sub">UK mobile (use in Europe)</span></div><span class="contact-phone">+44 7900 683683</span></a></div>
+    <div class="util-card"><h2 class="util-title">Useful phrases</h2><div class="util-sub">Italian &amp; French essentials</div>
+      <div class="phrase"><span class="en">The bill, please</span><span class="it">Il conto / L'addition, s'il vous plaît</span></div>
+      <div class="phrase"><span class="en">Table for two</span><span class="it">Un tavolo per due / Une table pour deux</span></div>
+      <div class="phrase"><span class="en">It was excellent</span><span class="it">Era squisito / C'était excellent</span></div>
+      <div class="phrase"><span class="en">I need a doctor</span><span class="it">Ho bisogno di un medico / J'ai besoin d'un médecin</span></div>
+      <div class="phrase"><span class="en">Help!</span><span class="it">Aiuto! / Au secours!</span></div></div>`;
 }
 
-/* ═════════════════════════════════════════════════════════════
-   FX CONVERTER
-   ═════════════════════════════════════════════════════════════ */
-function setupFX() {
-  const eur = $('#fx-eur'), gbp = $('#fx-gbp'), usd = $('#fx-usd');
-  if (!eur) return;
-  eur.value = 100;
-  convertFX('eur');
+function setupFX(){const e=$('#fx-eur'),g=$('#fx-gbp'),c=$('#fx-chf');if(!e)return;e.value=100;convertFX('eur');}
+function fmt(n,d){return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function parseFmt(v){return parseFloat(v.replace(/,/g,''));}
+function convertFX(src){
+  const e=$('#fx-eur'),g=$('#fx-gbp'),c=$('#fx-chf');if(!e||!g||!c)return;
+  let ev=parseFmt(e.value),gv=parseFmt(g.value),cv=parseFmt(c.value);
+  if(src==='eur'&&!isNaN(ev)){g.value=fmt(ev*FX_GBP_PER_EUR,2);c.value=fmt(ev*FX_CHF_PER_EUR,2);}
+  else if(src==='gbp'&&!isNaN(gv)){ev=gv/FX_GBP_PER_EUR;e.value=fmt(ev,2);c.value=fmt(ev*FX_CHF_PER_EUR,2);}
+  else if(src==='chf'&&!isNaN(cv)){ev=cv/FX_CHF_PER_EUR;e.value=fmt(ev,2);g.value=fmt(ev*FX_GBP_PER_EUR,2);}
 }
-function convertFX(src) {
-  const eur = $('#fx-eur'), gbp = $('#fx-gbp'), usd = $('#fx-usd');
-  if (!eur || !gbp || !usd) return;
-  let e = parseFloat(eur.value), g = parseFloat(gbp.value), u = parseFloat(usd.value);
-  if (src === 'eur' && !isNaN(e)) {
-    gbp.value = (e * FX_GBP_PER_EUR).toFixed(2);
-    usd.value = (e * FX_USD_PER_EUR).toFixed(2);
-  } else if (src === 'gbp' && !isNaN(g)) {
-    e = g / FX_GBP_PER_EUR;
-    eur.value = e.toFixed(2);
-    usd.value = (e * FX_USD_PER_EUR).toFixed(2);
-  } else if (src === 'usd' && !isNaN(u)) {
-    e = u / FX_USD_PER_EUR;
-    eur.value = e.toFixed(2);
-    gbp.value = (e * FX_GBP_PER_EUR).toFixed(2);
-  }
-}
+function switchTab(n){activeTab=n;$$('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===n));$$('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+n));window.scrollTo({top:0,behavior:'smooth'});}
+function refreshWeather(){$$('[data-weather]').forEach(el=>{const w=weatherCache[el.dataset.key];if(!w)return;const{icon,desc}=wmoToEmoji(w.code);const v=el.querySelector('.val');if(v)v.remove();const s=document.createElement('span');s.className='val';s.innerHTML=`${icon} ${w.min}°/${w.max}°C · ${desc} · ${w.rain}% rain`;el.appendChild(s);});}
+(async function init(){renderItinerary();renderUtilities();renderEmergency();updateClock();setInterval(updateClock,30000);weatherCache=await fetchWeather();refreshWeather();})();
 
-/* ═════════════════════════════════════════════════════════════
-   TABS
-   ═════════════════════════════════════════════════════════════ */
-function switchTab(name) {
-  activeTab = name;
-  $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
-  $$('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* ═════════════════════════════════════════════════════════════
-   INIT
-   ═════════════════════════════════════════════════════════════ */
-function refreshWeatherInDOM() {
-  $$('[data-weather]').forEach(el => {
-    const key = el.dataset.key;
-    const w = weatherCache[key];
-    if (!w) return;
-    const { icon, desc } = wmoToEmoji(w.code);
-    el.querySelector('.val')?.remove();
-    const v = document.createElement('span');
-    v.className = 'val';
-    v.innerHTML = `<span class="weather-icon">${icon}</span> ${w.min}° / ${w.max}°C · ${desc} · ${w.rain}% rain`;
-    el.appendChild(v);
-  });
-}
-
-(async function init() {
-  renderItinerary();
-  renderUtilities();
-  renderEmergency();
-  updateClock();
-  setInterval(updateClock, 30 * 1000);
-
-  weatherCache = await fetchWeather();
-  refreshWeatherInDOM();
-})();
 </script>
-
 </body>
 </html>
